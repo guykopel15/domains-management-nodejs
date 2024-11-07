@@ -71,6 +71,9 @@ async function main() {
 
     // Call the interval function every 60 seconds to update the dictionary
     interval_functions_every_60_seconds(_domain_objs);
+
+    // console.log(JSON.stringify(_domain_objs, null, 2));
+
 }
 
 // Function to handle interval tasks every 60 seconds
@@ -95,7 +98,6 @@ function interval_functions_every_60_seconds(domain_objs) {
             // Upsert dictionary entries
             upsert_dictionary(domain_obj, units_as_dic);
             handle_units_from_mongodb_into_the_dictionary(units_as_dic);
-
         }
     }, 60000);
 }
@@ -104,7 +106,6 @@ function set_non_active_units(domain_objects) {
     for (const domain_obj of Object.values(domain_objects)) {
         // Update non-active units based on threshold (_HEARTBEAT_THRESHOLD)
         const domain_units_stats = domain_obj.check_non_active_units_and_get_domain_units_state(_HEARTBEAT_THRESHOLD);
-        console.log(domain_units_stats);
     }
 }
 
@@ -112,12 +113,35 @@ function set_non_active_units(domain_objects) {
 
 // Listen for the MQTT message event and update the dictionary
 _emitter.on('mqtt_message_received', (topic, message) => {
-    const unit = JSON.parse(message.toString());
-    unit.is_active = true;
-    const domain_name = unit.domain;
-    const domain_obj = _domain_objs[domain_name];
-    domain_obj.upsert(unit);
+    switch (topic) {
+        case HEARTBEAT_TOPIC:
+            {
+                const unit = JSON.parse(message.toString());
+                unit.is_active = true;
+
+                // Convert domain name to uppercase for consistent access with original casing in _domain_objs
+                const domain_name = unit.domain;
+                const domain_obj = _domain_objs[domain_name];
+
+                //check how i get undefined on domains names
+                if (domain_obj === undefined) {
+                    console.log(`Domain not found in _domain_objs: ${domain_name}`);
+                    console.log("Unit data:", unit);  
+                    return;
+                }
+            }
+            break;
+        case RED_ALERT_NOTIFY_TOPIC:
+            {
+                const red_alert_message = JSON.parse(message.toString());
+                console.log("Red Alert:", red_alert_message);
+            }
+            break;
+    }
 });
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
