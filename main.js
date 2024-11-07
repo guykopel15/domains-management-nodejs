@@ -106,6 +106,7 @@ function set_non_active_units(domain_objects) {
     for (const domain_obj of Object.values(domain_objects)) {
         // Update non-active units based on threshold (_HEARTBEAT_THRESHOLD)
         const domain_units_stats = domain_obj.check_non_active_units_and_get_domain_units_state(_HEARTBEAT_THRESHOLD);
+        // console.log(domain_units_stats);
     }
 }
 
@@ -123,23 +124,59 @@ _emitter.on('mqtt_message_received', (topic, message) => {
                 const domain_name = unit.domain;
                 const domain_obj = _domain_objs[domain_name];
 
-                //check how i get undefined on domains names
-                if (domain_obj === undefined) {
-                    console.log(`Domain not found in _domain_objs: ${domain_name}`);
-                    console.log("Unit data:", unit);  
-                    return;
+                if(domain_obj) {
+                    domain_obj.upsert(unit);
+                    domain_obj.update_active_count();
+                    domain_obj.update_non_active_count();
+                }else{
+                    console.log(unit);  
                 }
             }
-            break;
+            break;    
         case RED_ALERT_NOTIFY_TOPIC:
             {
                 const red_alert_message = JSON.parse(message.toString());
-                console.log("Red Alert:", red_alert_message);
+                const red_alert_polygone = red_alert_message.alert.data;
+                const units_with_red_alert = units_inside_red_alert_polygone(red_alert_polygone, _domain_objs);
+                // console.log(units_with_red_alert);
             }
             break;
     }
 });
 
+function units_inside_red_alert_polygone(red_alert_polygone, domain_objs) {
+    let units_inside_red_alert = [];
+    //loop on every domain in the dictionary
+    Object.values(domain_objs).forEach(domain_obj => {
+        //loop on every unit in the specific domain
+        Object.values(domain_obj.units).forEach(unit => {
+            console.log(unit);
+            if (compare_units_polygone_to_red_alert_polygone(unit.saved_location, red_alert_polygone)) {
+                units_inside_red_alert.push(unit);
+            }
+        });
+    });
+
+    return units_inside_red_alert;
+}
+
+function compare_units_polygone_to_red_alert_polygone(unit_polygone, red_alert_polygone) {
+    // console.log(unit_polygone);
+    if (!unit_polygone || typeof unit_polygone !== 'string') {
+        // If `unit_polygone` is undefined or not a string, return false as there's no valid polygon data to compare
+        return false;
+    }
+    
+    const unit_locations = unit_polygone.split(',');
+    const alert_locations = red_alert_polygone.split(',');
+
+    for (const location of unit_locations) {
+        if (alert_locations.includes(location.trim())) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 
