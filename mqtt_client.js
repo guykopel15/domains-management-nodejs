@@ -1,7 +1,8 @@
 const { 
     BROKER_URL,
     HEARTBEAT_TOPIC,
-    RED_ALERT_NOTIFY_TOPIC
+    RED_ALERT_NOTIFY_TOPIC,
+    OPEN_ALL_SAFEHOUSES_TOPIC,
  } = require('./CONSTS');
 
 const emitter = require('./event_bus');
@@ -28,6 +29,14 @@ function handle_mqtt_connect(mqtt_client) {
             console.log(`Failed to subscribe to topic "${RED_ALERT_NOTIFY_TOPIC}":`, err);
         } else {
             console.log(`Subscribed to topic "${RED_ALERT_NOTIFY_TOPIC}"`);
+        }
+    });
+
+    mqtt_client.subscribe(OPEN_ALL_SAFEHOUSES_TOPIC, (err) => {
+        if (err) {
+            console.log(`Failed to subscribe to topic "${OPEN_ALL_SAFEHOUSES_TOPIC}":`, err);
+        } else {
+            console.log(`Subscribed to topic "${OPEN_ALL_SAFEHOUSES_TOPIC}"`);
         }
     });
 }

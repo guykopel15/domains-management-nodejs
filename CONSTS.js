@@ -1,6 +1,7 @@
 const BROKER_URL = 'mqtt://localhost:1883';
 const HEARTBEAT_TOPIC = 'general-heartbeat';
 const RED_ALERT_NOTIFY_TOPIC = 'red-alert-notify';
+const OPEN_ALL_SAFEHOUSES_TOPIC= 'open-close-all-safehouses';
 
 const MONGO_DB_URL = 'mongodb://localhost:27017';
 const MONGO_DB_DATABASE = 'unit_management';
@@ -14,4 +15,5 @@ module.exports = {
     MONGO_DB_DATABASE,
     MONGO_UNIT_COLLECTION_NAME,  
     RED_ALERT_NOTIFY_TOPIC,
+    OPEN_ALL_SAFEHOUSES_TOPIC,
 };

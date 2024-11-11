@@ -117,69 +117,59 @@ _emitter.on('mqtt_message_received', (topic, message) => {
     switch (topic) {
         case HEARTBEAT_TOPIC:
             {
+                //parse the message to get the unit
                 const unit = JSON.parse(message.toString());
                 unit.is_active = true;
-
-                // Convert domain name to uppercase for consistent access with original casing in _domain_objs
                 const domain_name = unit.domain;
                 const domain_obj = _domain_objs[domain_name];
-
-                if(domain_obj) {
-                    domain_obj.upsert(unit);
-                    domain_obj.update_active_count();
-                    domain_obj.update_non_active_count();
-                }else{
-                    console.log(unit);  
-                }
-            }
-            break;    
-        case RED_ALERT_NOTIFY_TOPIC:
-            {
-                const red_alert_message = JSON.parse(message.toString());
-                const red_alert_polygone = red_alert_message.alert.data;
-                const units_with_red_alert = units_inside_red_alert_polygone(red_alert_polygone, _domain_objs);
-                // console.log(units_with_red_alert);
+                domain_obj.upsert(unit);
+                domain_obj.update_active_count();
+                domain_obj.update_non_active_count();
             }
             break;
+        case RED_ALERT_NOTIFY_TOPIC:
+            {
+                //parse the message to get the red alert polygone
+                const red_alert_message = JSON.parse(message.toString());
+                const red_alert_locations = red_alert_message.alert.data;
+                const units_with_red_alert = units_inside_red_alert_locations(red_alert_locations, _domain_objs);
+                console.log(units_with_red_alert);
+            }
+            break;
+        case OPEN_ALL_SAFEHOUSES_TOPIC:
+            {
+
+            }
     }
 });
 
-function units_inside_red_alert_polygone(red_alert_polygone, domain_objs) {
+function units_inside_red_alert_locations(red_alert_locations, domain_objs) {
     let units_inside_red_alert = [];
     //loop on every domain in the dictionary
     Object.values(domain_objs).forEach(domain_obj => {
         //loop on every unit in the specific domain
-        Object.values(domain_obj.units).forEach(unit => {
-            console.log(unit);
-            if (compare_units_polygone_to_red_alert_polygone(unit.saved_location, red_alert_polygone)) {
+        for (const unit_key in domain_obj.units) {
+            const unit = domain_obj.units[unit_key];
+            if (!unit.saved_location)
+                continue;
+
+            if (compare_units_polygone_to_red_alert_locations(unit.saved_location, red_alert_locations)) {
                 units_inside_red_alert.push(unit);
             }
-        });
+        }
     });
 
     return units_inside_red_alert;
 }
 
-function compare_units_polygone_to_red_alert_polygone(unit_polygone, red_alert_polygone) {
-    // console.log(unit_polygone);
-    if (!unit_polygone || typeof unit_polygone !== 'string') {
-        // If `unit_polygone` is undefined or not a string, return false as there's no valid polygon data to compare
-        return false;
-    }
-    
-    const unit_locations = unit_polygone.split(',');
-    const alert_locations = red_alert_polygone.split(',');
-
-    for (const location of unit_locations) {
-        if (alert_locations.includes(location.trim())) {
+function compare_units_polygone_to_red_alert_locations(unit_saved_location, red_alert_locations) {
+    for (const location of unit_saved_location) {
+        if (red_alert_locations.includes(location)) {
             return true;
         }
     }
     return false;
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 main();
