@@ -1,9 +1,13 @@
+const Units_Object = require('./units_obj');
+const _emitter = require('./event_bus');
+
 const {
     fetch_units_from_specific_sql_domain,
 } = require('./mysql_handling');
 
 const {
-    setup_mqtt_listener
+    setup_mqtt_listener,
+    publish_mqtt_message,
 } = require('./mqtt_client');
 
 const {
@@ -19,11 +23,10 @@ const {
 
 const {
     HEARTBEAT_TOPIC,
-    RED_ALERT_NOTIFY_TOPIC
+    RED_ALERT_NOTIFY_TOPIC,
+    OPEN_SAFEHOUSE_TOPIC,
+    GENERAL_LOCK_ACKNOWLEDGE_TOPIC,
 } = require('./CONSTS');
-
-const Units_Object = require('./units_obj');
-const _emitter = require('./event_bus');
 
 
 // List of domains and their respective IP addresses
@@ -71,9 +74,6 @@ async function main() {
 
     // Call the interval function every 60 seconds to update the dictionary
     interval_functions_every_60_seconds(_domain_objs);
-
-    // console.log(JSON.stringify(_domain_objs, null, 2));
-
 }
 
 // Function to handle interval tasks every 60 seconds
@@ -99,8 +99,11 @@ function interval_functions_every_60_seconds(domain_objs) {
             upsert_dictionary(domain_obj, units_as_dic);
             handle_units_from_mongodb_into_the_dictionary(units_as_dic);
         }
-    }, 60000);
+    }, 60 * 1000);
 }
+
+
+///////////////////////////////////// END execute with delay ////////////////////////////////////////////
 
 function set_non_active_units(domain_objects) {
     for (const domain_obj of Object.values(domain_objects)) {
@@ -117,58 +120,108 @@ _emitter.on('mqtt_message_received', (topic, message) => {
     switch (topic) {
         case HEARTBEAT_TOPIC:
             {
-                //parse the message to get the unit
-                const unit = JSON.parse(message.toString());
-                unit.is_active = true;
-                const domain_name = unit.domain;
-                const domain_obj = _domain_objs[domain_name];
-                domain_obj.upsert(unit);
-                domain_obj.update_active_count();
-                domain_obj.update_non_active_count();
+                const units = JSON.parse(message.toString());
+                for (const unit of units) {
+                    const domain_name = unit.domain;
+                    const domain_obj = _domain_objs[domain_name];
+                    domain_obj.upsert(unit);
+                    domain_obj.update_active_count();
+                    domain_obj.update_non_active_count();
+                }
+            }
+            break;
+        case GENERAL_LOCK_ACKNOWLEDGE_TOPIC:
+            {
+                const units = JSON.parse(message.toString());
+                for (const unit of units) {
+                    const domain_name = unit.domain;
+                    const domain_obj = _domain_objs[domain_name];
+                    const unit_extra_data = unit.extra_data;
+                    if(unit_extra_data.open_lock){
+                        console.log(domain_obj.units[unit.device_serial]);
+                        domain_obj.units[unit.device_serial].is_open = true;
+
+                    }
+                }
             }
             break;
         case RED_ALERT_NOTIFY_TOPIC:
             {
                 //parse the message to get the red alert polygone
                 const red_alert_message = JSON.parse(message.toString());
-                const red_alert_locations = red_alert_message.alert.data;
-                const units_with_red_alert = units_inside_red_alert_locations(red_alert_locations, _domain_objs);
-                console.log(units_with_red_alert);
-            }
-            break;
-        case OPEN_ALL_SAFEHOUSES_TOPIC:
-            {
+                const red_alert_poligon_arr = red_alert_message.alert.data;
+                const poligon_unit_array = get_units_arr_that_match_poligon_alert(red_alert_poligon_arr, _domain_objs);
+
+                run_multiple_times_with_delay(poligon_unit_array, 3, 10 * 1000).then(() => {
+                    console.log('3 times done');
+                });                
+
 
             }
+            break;
     }
 });
 
-function units_inside_red_alert_locations(red_alert_locations, domain_objs) {
-    let units_inside_red_alert = [];
-    //loop on every domain in the dictionary
+///////////////////////////////////// execute with delay ////////////////////////////////////////////
+async function execute_open_with_delay(need_to_open_unit_arr) {
+    for (const unit of need_to_open_unit_arr) {
+        const topic = unit.unique_id + '/' + OPEN_SAFEHOUSE_TOPIC;
+        publish_mqtt_message(topic, '1');
+        await delay(250);
+    }
+}
+
+async function run_multiple_times_with_delay(units_not_open, times, delay_between_runs) {
+    for (let i = 0; i < times; i++) {
+
+        await execute_open_with_delay(units_not_open);
+        if (i > times - 1)
+            continue;
+
+        // delay between each run
+        await delay(delay_between_runs);  
+    }
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+function get_units_arr_that_match_poligon_alert(red_alert_poligons, domain_objs) {
+    let units = [];
+    //loop domains dictionary
     Object.values(domain_objs).forEach(domain_obj => {
-        //loop on every unit in the specific domain
-        for (const unit_key in domain_obj.units) {
-            const unit = domain_obj.units[unit_key];
+        for (const device_serial in domain_obj.units) {
+            const unit = domain_obj.units[device_serial];
             if (!unit.saved_location)
                 continue;
 
-            if (compare_units_polygone_to_red_alert_locations(unit.saved_location, red_alert_locations)) {
-                units_inside_red_alert.push(unit);
-            }
+            if (!is_part_of_poligon(unit.saved_location, red_alert_poligons))
+                continue;
+
+            units.push(unit);
         }
     });
 
-    return units_inside_red_alert;
+    return units;
 }
 
-function compare_units_polygone_to_red_alert_locations(unit_saved_location, red_alert_locations) {
-    for (const location of unit_saved_location) {
-        if (red_alert_locations.includes(location)) {
-            return true;
-        }
+function is_part_of_poligon(unit_saved_location, red_alert_poligons) {
+    // ensure unit_saved_location is an array. (old version didn't use array for saved_location)
+    const unit_saved_locations_array =
+        Array.isArray(unit_saved_location) ? unit_saved_location : [unit_saved_location];
+
+    let is_inside_poligon = false;
+    for (const location of unit_saved_locations_array) {
+        if (!red_alert_poligons.includes(location))
+            continue;
+
+        is_inside_poligon = true;
+        break
     }
-    return false;
+
+    return is_inside_poligon;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
