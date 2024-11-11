@@ -102,7 +102,6 @@ function interval_functions_every_60_seconds(domain_objs) {
     }, 60 * 1000);
 }
 
-
 ///////////////////////////////////// END execute with delay ////////////////////////////////////////////
 
 function set_non_active_units(domain_objects) {
