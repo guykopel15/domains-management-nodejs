@@ -1,67 +1,48 @@
-const { 
-    BROKER_URL,
-    HEARTBEAT_TOPIC,
-    RED_ALERT_NOTIFY_TOPIC,
-    GENERAL_LOCK_ACKNOWLEDGE_TOPIC,
- } = require('./CONSTS');
-
-const emitter = require('./event_bus');
 const mqtt = require('mqtt');
+const emitter = require('./event_bus');
 
-function setup_mqtt_listener() {
-    const mqtt_client = mqtt.connect(BROKER_URL);
-    mqtt_client.on('connect', () => handle_mqtt_connect(mqtt_client));
-    mqtt_client.on('message', (topic, message) => handle_mqtt_message(topic, message));
-    mqtt_client.on('error', handle_mqtt_error);
-};
+class MqttClient_Obj {
+    #_mqtt_client = null;
+    mqtt_broker_url = "";
+    domain_name = "";
 
-function handle_mqtt_connect(mqtt_client) {
-    mqtt_client.subscribe(HEARTBEAT_TOPIC, (err) => {
-        if (err) {
-            console.log(`Failed to subscribe to topic "${HEARTBEAT_TOPIC}":`, err);
-        } else {
-            console.log(`Subscribed to topic "${HEARTBEAT_TOPIC}"`);
+    constructor(domain_name, mqtt_broker_url, port, subscription_topics = []) {
+        this.domain_name = domain_name;
+        this.mqtt_broker_url = mqtt_broker_url;
+        this.#setup_mqtt_listener(mqtt_broker_url, port, subscription_topics);
+    }
+ 
+    #setup_mqtt_listener(mqtt_broker_url, port, subscription_topics) {
+        this.#_mqtt_client = mqtt.connect(`${mqtt_broker_url}:${port}`);
+        this.#_mqtt_client.on('connect', () => this.#subscribe_after_connect(this.#_mqtt_client, subscription_topics));
+        this.#_mqtt_client.on('message', (topic, message) => this.#handle_mqtt_message(topic, message));
+        this.#_mqtt_client.on('error', this.handle_mqtt_error);
+    }
+
+    #subscribe_after_connect(mqtt_client, subscription_topics) {
+        console.log(`Connected to MQTT broker at ${this.domain_name}`);
+        for (const topic of subscription_topics) {
+            mqtt_client.subscribe(topic, (err) => {
+                if (err) console.log(`Failed to subscribe to topic "${topic}":`, err);
+                else console.log(`Subscribed to topic "${topic}"`);
+            });
         }
-    });
+    }
 
-    mqtt_client.subscribe(RED_ALERT_NOTIFY_TOPIC, (err) => {
-        if (err) {
-            console.log(`Failed to subscribe to topic "${RED_ALERT_NOTIFY_TOPIC}":`, err);
-        } else {
-            console.log(`Subscribed to topic "${RED_ALERT_NOTIFY_TOPIC}"`);
-        }
-    });
+    publish_mqtt_message(topic, message) {
+        this.#_mqtt_client.publish(topic, message, (err) => {
+            if (err) console.error(`Failed to publish message to topic "${topic}":`, err);
+            else console.log(`Message published to "${topic}":`, message);
+        });
+    }
 
-    mqtt_client.subscribe(GENERAL_LOCK_ACKNOWLEDGE_TOPIC, (err) => {
-        if (err) {
-            console.log(`Failed to subscribe to topic "${GENERAL_LOCK_ACKNOWLEDGE_TOPIC}":`, err);
-        } else {
-            console.log(`Subscribed to topic "${GENERAL_LOCK_ACKNOWLEDGE_TOPIC}"`);
-        }
-    });
+    #handle_mqtt_message(topic, message) {
+        emitter.emit('mqtt_message_received', topic, message, this.domain_name);
+    }
+
+    handle_mqtt_error(error) {
+        console.error('Error in MQTT connection:', error);
+    }
 }
 
-function publish_mqtt_message(topic, message) {
-    const mqtt_client = mqtt.connect(BROKER_URL);
-    mqtt_client.publish(topic, message, (err) => {
-        if (err) {
-            console.error(`Failed to publish message to topic "${topic}":`, err);
-        } else {
-            console.log(`Message published to "${topic}":`, message);
-        }
-    });
-}
-
-
-function handle_mqtt_message(topic, message) {    
-    emitter.emit('mqtt_message_received', topic, message);
-}
-
-function handle_mqtt_error(error) {
-    console.error('Error in MQTT connection:', error);
-}
-
-module.exports = {
-    setup_mqtt_listener,
-    publish_mqtt_message
-};
+module.exports = MqttClient_Obj;

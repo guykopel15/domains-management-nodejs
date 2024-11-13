@@ -5,8 +5,9 @@ class Units_Object {
     #non_active_units = -1;
     #need_update = true;
     units = {};
+    #mqtt_client = null;
 
-    constructor(domain_name = "", units_json_dict = {}) {
+    constructor(domain_name, units_json_dict = {}) {
         this.#domain_name = domain_name;
         this.init(domain_name, units_json_dict);
     }
@@ -22,6 +23,17 @@ class Units_Object {
         });
         this.#total_unit_count = units_array.length;
     }
+
+    /////////////////////////////////////////////// mqtt ///////////////////////////////////////////////
+    set_mqtt_client(mqtt_client) {
+        this.#mqtt_client = mqtt_client;
+    }
+
+    publish_mqtt_message(topic, message) {
+        this.#mqtt_client.publish_mqtt_message(topic, message);
+    }
+
+    /////////////////////////////////////////////// end mqtt ///////////////////////////////////////////////
 
     add_unit(unit) {
         this.units[unit.device_serial] = unit;

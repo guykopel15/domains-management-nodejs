@@ -1,4 +1,8 @@
+const path = require('path');
+const fs = require('fs');
+
 const Units_Object = require('./units_obj');
+const MqttClient_Obj = require('./mqtt_client');
 const _emitter = require('./event_bus');
 
 const {
@@ -6,15 +10,9 @@ const {
 } = require('./mysql_handling');
 
 const {
-    setup_mqtt_listener,
-    publish_mqtt_message,
-} = require('./mqtt_client');
-
-const {
     handle_units_from_mongodb_into_the_dictionary,
     convert_mysql_row_to_mongo_rows,
     add_domain_name_to_the_db_units_json,
-    delete_all_data_from_mongodb
 } = require('./mongo_handling');
 
 const {
@@ -24,10 +22,12 @@ const {
 const {
     HEARTBEAT_TOPIC,
     RED_ALERT_NOTIFY_TOPIC,
-    OPEN_SAFEHOUSE_TOPIC,
     GENERAL_LOCK_ACKNOWLEDGE_TOPIC,
+    LOCAL_BROKER_URL,
+    LOCAL_SUBSCRIPTION_TOPICS,
+    BOBO1_DOMAIN_NAME,
+    OPEN_SAFEHOUSE_TOPIC,
 } = require('./CONSTS');
-
 
 // List of domains and their respective IP addresses
 const _mysql_servers = [
@@ -55,29 +55,41 @@ const _HEARTBEAT_THRESHOLD = 30000;
 
 // Initialize _domain_objs as instances of Units_Object
 const _domain_objs = {};
-
-_mysql_servers.forEach(server => {
-    _domain_objs[server.name] = new Units_Object(server.name, {});
-});
+var _localhost_mqtt_client = null
 
 async function main() {
+    console.log('Starting main function...');
+    _mysql_servers.forEach(server => {
+        _domain_objs[server.name] = new Units_Object(server.name, {});
+    });
+
+    _localhost_mqtt_client = new MqttClient_Obj(BOBO1_DOMAIN_NAME, LOCAL_BROKER_URL, 1883, LOCAL_SUBSCRIPTION_TOPICS);
+
     for (const mysql_server of _mysql_servers) {
         const db_units = await fetch_units_from_specific_sql_domain(mysql_server.host);
         const db_units_full_json = add_domain_name_to_the_db_units_json(db_units, mysql_server.name);
         const mongo_table = convert_mysql_row_to_mongo_rows(db_units_full_json);
         const domain_obj = _domain_objs[mysql_server.name];
+
         upsert_dictionary(domain_obj, mongo_table);
         handle_units_from_mongodb_into_the_dictionary(mongo_table);
+        console.log(`Units from ${mysql_server.name} added to dictionary.`);
     }
 
-    setup_mqtt_listener();
+    for (const mysql_server of _mysql_servers) {
+        const domain_obj = _domain_objs[mysql_server.name];
+        const mqtt_broker = `mqtt://${mysql_server.host}`
+        const mqtt_client = new MqttClient_Obj(mysql_server.name, mqtt_broker, 1883);
+
+        domain_obj.set_mqtt_client(mqtt_client);
+        console.log(`MQTT client for ${mysql_server.name} created.`);
+    }
 
     // Call the interval function every 60 seconds to update the dictionary
-    interval_functions_every_60_seconds(_domain_objs);
+    interval_functions_every_30_seconds(_domain_objs);
 }
 
-// Function to handle interval tasks every 60 seconds
-function interval_functions_every_60_seconds(domain_objs) {
+function interval_functions_every_30_seconds(domain_objs) {
     setInterval(async () => {
         for (const mysql_server of _mysql_servers) {
             const mysql_all_units = await fetch_units_from_specific_sql_domain(mysql_server.host);
@@ -98,32 +110,37 @@ function interval_functions_every_60_seconds(domain_objs) {
             // Upsert dictionary entries
             upsert_dictionary(domain_obj, units_as_dic);
             handle_units_from_mongodb_into_the_dictionary(units_as_dic);
-        }
-    }, 60 * 1000);
-}
 
+            console.log(`Units from ${mysql_server.name} updated.`);
+        }
+    }, 30 * 1000);
+}
 
 ///////////////////////////////////// END execute with delay ////////////////////////////////////////////
 
 function set_non_active_units(domain_objects) {
     for (const domain_obj of Object.values(domain_objects)) {
         // Update non-active units based on threshold (_HEARTBEAT_THRESHOLD)
-        const domain_units_stats = domain_obj.check_non_active_units_and_get_domain_units_state(_HEARTBEAT_THRESHOLD);
-        // console.log(domain_units_stats);
+        domain_obj.check_non_active_units_and_get_domain_units_state(_HEARTBEAT_THRESHOLD);
     }
 }
 
-///////////////////////////////////////////// callbacks /////////////////////////////////////////////
+// ///////////////////////////////////////////// callbacks /////////////////////////////////////////////
 
 // Listen for the MQTT message event and update the dictionary
-_emitter.on('mqtt_message_received', (topic, message) => {
+_emitter.on('mqtt_message_received', (topic, message, domain_name) => {
     switch (topic) {
         case HEARTBEAT_TOPIC:
             {
                 const units = JSON.parse(message.toString());
                 for (const unit of units) {
+                    if (unit.action != 'heartbeat') {
+                        continue;
+                    }
+
                     const domain_name = unit.domain;
                     const domain_obj = _domain_objs[domain_name];
+                    unit.is_active = true;
                     domain_obj.upsert(unit);
                     domain_obj.update_active_count();
                     domain_obj.update_non_active_count();
@@ -133,53 +150,53 @@ _emitter.on('mqtt_message_received', (topic, message) => {
         case GENERAL_LOCK_ACKNOWLEDGE_TOPIC:
             {
                 const units = JSON.parse(message.toString());
-                for (const unit of units) {
-                    const domain_name = unit.domain;
+                for (const incomming_unit of units) {
+                    const domain_name = incomming_unit.domain;
                     const domain_obj = _domain_objs[domain_name];
-                    const unit_extra_data = unit.extra_data;
-                    if(unit_extra_data.open_lock){
-                        console.log(domain_obj.units[unit.device_serial]);
-                        domain_obj.units[unit.device_serial].is_open = true;
-
+                    const unit = domain_obj.units[incomming_unit.device_serial];
+                    if (unit) {
+                        unit.lock_data = incomming_unit.extra_data;
+                        domain_obj.upsert(unit);
                     }
                 }
             }
             break;
         case RED_ALERT_NOTIFY_TOPIC:
             {
+                console.log('Red alert notify received');
                 //parse the message to get the red alert polygone
                 const red_alert_message = JSON.parse(message.toString());
                 const red_alert_poligon_arr = red_alert_message.alert.data;
                 const poligon_unit_array = get_units_arr_that_match_poligon_alert(red_alert_poligon_arr, _domain_objs);
 
-                run_multiple_times_with_delay(poligon_unit_array, 3, 10 * 1000).then(() => {
+                run_multiple_times_with_delay(poligon_unit_array, 3, 10 * 1000, _domain_objs).then(() => {
                     console.log('3 times done');
-                });                
-
-
+                    save_closed_units_to_file(_domain_objs, poligon_unit_array);
+                });
             }
             break;
     }
 });
 
 ///////////////////////////////////// execute with delay ////////////////////////////////////////////
-async function execute_open_with_delay(need_to_open_unit_arr) {
+async function execute_open_with_delay(need_to_open_unit_arr, domain_objs) {
     for (const unit of need_to_open_unit_arr) {
         const topic = unit.unique_id + '/' + OPEN_SAFEHOUSE_TOPIC;
-        publish_mqtt_message(topic, '1');
-        await delay(250);
+        console.log(`Opening unit ${unit.device_serial} with topic: ${topic} at domain ${unit.domain}`);
+        // domain_objs[unit.domain].publish_mqtt_message(topic, '1');
+        await delay(100);
     }
 }
 
-async function run_multiple_times_with_delay(units_not_open, times, delay_between_runs) {
+async function run_multiple_times_with_delay(units_not_open, times, delay_between_runs, domain_objs) {
     for (let i = 0; i < times; i++) {
-
-        await execute_open_with_delay(units_not_open);
+        console.log(`Open units for ${i + 1} time`);
+        await execute_open_with_delay(units_not_open, domain_objs);
         if (i > times - 1)
             continue;
 
         // delay between each run
-        await delay(delay_between_runs);  
+        await delay(delay_between_runs);
     }
 }
 
@@ -187,17 +204,48 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function save_closed_units_to_file(domain_objs, poligon_unit_array) {
+    const unopened_units = [];
 
-function get_units_arr_that_match_poligon_alert(red_alert_poligons, domain_objs) {
+    // Loop through poligon_unit_array to collect units that are still not open
+    for (const unit of poligon_unit_array) {
+        const domain_obj = domain_objs[unit.domain];
+        const unit_in_domain = domain_obj && domain_obj.units[unit.device_serial];
+
+        if (unit_in_domain && !unit_in_domain.is_open) {
+            unopened_units.push({
+                device_serial: unit_in_domain.device_serial,
+                address: unit_in_domain.address || "-",
+                unique_id: unit_in_domain.unique_id,
+                unit_polygone: unit_in_domain.saved_location || "-",
+                is_open: unit_in_domain.is_open,
+                domain: unit_in_domain.domain
+            });
+        }
+    }
+
+    const file_path = path.join(__dirname, 'closed_units.json');
+
+    fs.writeFileSync(file_path, JSON.stringify(unopened_units, null, 2), 'utf8');
+
+    const summary = {
+        timestamp: new Date(new Date().getTime() + 2 * 60 * 60 * 1000).toLocaleString('en-IL', { hour12: false }),
+        unopened_units_count: unopened_units.length
+    };
+    fs.appendFileSync(file_path, `\n${JSON.stringify(summary, null, 2)}`, 'utf8');
+    console.log(`Summary data appended to ${file_path}`);
+}
+
+function get_units_arr_that_match_poligon_alert(red_alert_polygons, domain_objs) {
     let units = [];
     //loop domains dictionary
     Object.values(domain_objs).forEach(domain_obj => {
         for (const device_serial in domain_obj.units) {
             const unit = domain_obj.units[device_serial];
-            if (!unit.saved_location)
+            if (!unit.is_active || !unit.saved_location || !unit.red_alert_polygon)
                 continue;
 
-            if (!is_part_of_poligon(unit.saved_location, red_alert_poligons))
+            if (!is_part_of_poligon(unit.saved_location, unit.red_alert_polygon, red_alert_polygons))
                 continue;
 
             units.push(unit);
@@ -207,14 +255,14 @@ function get_units_arr_that_match_poligon_alert(red_alert_poligons, domain_objs)
     return units;
 }
 
-function is_part_of_poligon(unit_saved_location, red_alert_poligons) {
+function is_part_of_poligon(unit_saved_location, unit_red_alert_polygon, red_alert_polygons) {
     // ensure unit_saved_location is an array. (old version didn't use array for saved_location)
     const unit_saved_locations_array =
         Array.isArray(unit_saved_location) ? unit_saved_location : [unit_saved_location];
 
     let is_inside_poligon = false;
     for (const location of unit_saved_locations_array) {
-        if (!red_alert_poligons.includes(location))
+        if (!red_alert_polygons.includes(location) && !unit_red_alert_polygon.includes(location))
             continue;
 
         is_inside_poligon = true;
