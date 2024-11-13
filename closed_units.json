@@ -1,628 +1,218 @@
 [
   {
-    "device_serial": "R92W201AHQB",
+    "device_serial": "R92W201AX1V",
     "address": "-",
-    "unique_id": "3f814f86-2103-432c-a1ce-d12e091b7a5b",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AK1J",
-    "address": "-",
-    "unique_id": "e50a4892-14f3-44d0-96aa-0c0300624c35",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201ATAA",
-    "address": "-",
-    "unique_id": "5264f2a6-8b6e-4755-a092-3467b68bd44e",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201ARGW",
-    "address": "-",
-    "unique_id": "79a31e95-1077-4557-b834-49ccc0730eef",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B06T",
-    "address": "-",
-    "unique_id": "5667d081-2583-4a5b-afd5-61c5bd5592c7",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AWET",
-    "address": "-",
-    "unique_id": "6c642e50-9e4f-497f-b8bd-d09c6aacf3d2",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AVVJ",
-    "address": "-",
-    "unique_id": "9c26495e-60da-451b-a4bf-cd043f4dd063",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201ATCE",
-    "address": "-",
-    "unique_id": "b2add6c8-b29d-4552-9619-76f890cbec6c",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201ADJW",
-    "address": "-",
-    "unique_id": "0f432925-31bb-4963-a30c-fd815ca038c5",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201ASEH",
-    "address": "-",
-    "unique_id": "1eef1c6f-a45e-4053-aec6-a7c119b218a1",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
+    "unique_id": "ca178d1e-e092-435e-984c-c7b63fff1628",
+    "unit_polygone": "[\"חיפה - נווה שאנן ורמות כרמל\",\"חיפה - מערב\",\"חיפה - קריית חיים ושמואל\",\"חיפה - מפרץ\"]",
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
+    "domain": "bobo2"
   },
   {
     "device_serial": "R92W201ARPA",
     "address": "-",
     "unique_id": "80483568-1893-48a3-8659-d9448fa1f385",
-    "unit_polygone": "חיפה",
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-נווה שאנן ורמות כרמל"
+    ],
     "is_open": false,
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
   },
   {
-    "device_serial": "R92W201B6KW",
+    "device_serial": "R92TB0EYEQF",
     "address": "-",
-    "unique_id": "bf907bdf-eab9-4e19-bbe2-4eea2a6d5c59",
-    "unit_polygone": "חיפה",
+    "unique_id": "b17108d5-3157-4d43-aac1-bd1cfe3802ea",
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-נווה שאנן ורמות כרמל"
+    ],
     "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B3LZ",
-    "address": "-",
-    "unique_id": "59f44cb5-22d2-442b-a48b-675af1679cdc",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B4NE",
-    "address": "-",
-    "unique_id": "e753e3c5-7f4e-46d5-9885-a4bf56b80f1a",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B3RP",
-    "address": "-",
-    "unique_id": "bbcae651-a945-4017-ae05-6fe23834c458",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AXBY",
-    "address": "-",
-    "unique_id": "669f155f-6ddb-4773-84b6-d3d05e3220cb",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AMNY",
-    "address": "-",
-    "unique_id": "44eedce7-e214-4eac-9899-12864800eb40",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201ADMJ",
-    "address": "-",
-    "unique_id": "1e903e1c-b5af-4234-bf6b-c41c99e80d5c",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AW0Z",
-    "address": "-",
-    "unique_id": "e6747123-4a0f-40de-8028-28103ecc1cb7",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AEXE",
-    "address": "-",
-    "unique_id": "5d521b45-8504-432c-879d-e0b66610773e",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA10RBQY",
-    "address": "-",
-    "unique_id": "065cda69-720d-4cd3-bf08-c842195b2ce7",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA10S2YK",
-    "address": "-",
-    "unique_id": "f8da181c-8fbb-49a7-bf03-3eaa46f01b7c",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0F0H5L",
-    "address": "-",
-    "unique_id": "dd62c0f6-0b13-42cb-baee-f5a34b3dca30",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA10S1XX",
-    "address": "-",
-    "unique_id": "d5357b8f-3028-4f3a-a668-5dad3473ed8c",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0F0HJK",
-    "address": "-",
-    "unique_id": "9ebe7ec2-f181-4a66-be54-7f8b0f0eb81a",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY36H",
-    "address": "-",
-    "unique_id": "8c4b482a-9650-4736-9843-f7559f3776f1",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EYFEX",
-    "address": "-",
-    "unique_id": "b5af491d-3d33-4356-afa0-fbab7f41b1c6",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0F0GFK",
-    "address": "-",
-    "unique_id": "1aec0953-6b76-46aa-bfbb-c69bf55df8fa",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY51N",
-    "address": "-",
-    "unique_id": "4b4a485e-5776-48fa-a978-b94593e66375",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AJ5Z",
-    "address": "-",
-    "unique_id": "a3993747-12a4-456a-9e56-18cdee8da1bc",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B1TD",
-    "address": "-",
-    "unique_id": "3c9720e1-3043-4b1d-bb9f-8bef2681fc04",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AZAM",
-    "address": "-",
-    "unique_id": "d9434754-36e6-4992-8e4f-9d339fb9bef2",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AY3A",
-    "address": "-",
-    "unique_id": "eeef8dd2-304f-47a9-b74c-2a24bd033c56",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0NXRQT",
-    "address": "-",
-    "unique_id": "af41ba6a-4a4c-4996-ac44-53dd99cc30fb",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB097J2H",
-    "address": "-",
-    "unique_id": "b7d5eeaa-7b5a-402c-b00d-c6de024b64f6",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W700W4CT",
-    "address": "-",
-    "unique_id": "99d37ec5-8312-4bb9-b06e-7628268e0894",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B2JM",
-    "address": "-",
-    "unique_id": "453a437b-0f5d-46fa-baf3-4b79fb042fa8",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0971KV",
-    "address": "-",
-    "unique_id": "6135e06e-01cc-4dc1-b20f-77f378b720eb",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB01LNXZ",
-    "address": "-",
-    "unique_id": "2fb20286-1f16-44fc-a838-f076804ea2c0",
-    "unit_polygone": "חיפה",
-    "is_open": false,
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
   },
   {
     "device_serial": "R92TB0NXLDV",
     "address": "-",
     "unique_id": "bfd1d949-57e4-499b-88fc-2787ce20ce4b",
-    "unit_polygone": "חיפה",
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - קריית חיים ושמואל",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " קריית מוצקין",
+      " קריית ביאליק",
+      " קריית ים",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-קריית חיים ושמואל",
+      " חיפה-נווה שאנן ורמות כרמל",
+      " קריית מוצקין",
+      " קריית ביאליק",
+      " קריית ים"
+    ],
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
   },
   {
     "device_serial": "R92W505RPAM",
     "address": "-",
     "unique_id": "08d5a63c-0673-488e-aa32-9c7def8c4c09",
-    "unit_polygone": "חיפה",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W60AA0DF",
-    "address": "-",
-    "unique_id": "9512f71c-0f1e-4a49-9c0f-5ea118a4a7b3",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B6JY",
-    "address": "-",
-    "unique_id": "70910ce4-6c5a-47c9-b8c7-1cbb8c571e68",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AZZH",
-    "address": "-",
-    "unique_id": "8779d39b-7f73-4fd3-815c-5f06e16944fe",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W505T0VH",
-    "address": "-",
-    "unique_id": "45ff67ce-dde4-4996-8609-351beef012da",
-    "unit_polygone": "חיפה",
-    "is_open": false,
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-נווה שאנן ורמות כרמל"
+    ],
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
   },
   {
     "device_serial": "R92W700WS6W",
     "address": "-",
     "unique_id": "a29810de-1de7-42ce-b973-cec3b46188e3",
-    "unit_polygone": "חיפה",
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-נווה שאנן ורמות כרמל"
+    ],
     "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201ASJY",
-    "address": "-",
-    "unique_id": "c26f0dcb-a3d4-4f9f-b752-7cf9b5f1ddf4",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AK4R",
-    "address": "-",
-    "unique_id": "1ce9e783-424d-4ea9-a4f7-4fe55db5f9d1",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AVSN",
-    "address": "-",
-    "unique_id": "760b027a-be84-4eb0-874c-820f6301a486",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B9FR",
-    "address": "-",
-    "unique_id": "0102213c-f4a8-4423-9dfd-4ebe53a0601e",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W700WH9Z",
-    "address": "-",
-    "unique_id": "8e93ada6-55de-485d-8059-c77519de5f42",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EYF5Z",
-    "address": "קסל 9",
-    "unique_id": "2aad806d-85d4-4114-bdfe-9ab09d9239cb",
-    "unit_polygone": "-",
-    "is_open": 0,
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
   },
   {
     "device_serial": "R92W700WKHF",
     "address": "-",
     "unique_id": "7c81d9eb-a06c-4121-ba02-614c18425c53",
-    "unit_polygone": "חיפה",
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-נווה שאנן ורמות כרמל"
+    ],
     "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0NYC2R",
-    "address": "-",
-    "unique_id": "ef3a14c4-66a6-434d-8e67-bf222ff5f482",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AS8V",
-    "address": "-",
-    "unique_id": "3cf2177c-fafe-4835-b6e9-925c5d9077e8",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY7VX",
-    "address": "-",
-    "unique_id": "aefb57dc-e4e5-4c3d-8909-1108e71eede3",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA110GNV",
-    "address": "-",
-    "unique_id": "cb641786-f02f-40ae-8078-594ab678a722",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W60AAHWA",
-    "address": "-",
-    "unique_id": "c62dd31d-3af2-4371-8489-48968d3a6a49",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY8FW",
-    "address": "-",
-    "unique_id": "876087ba-b4b4-4600-b1c9-5e14ce0c1f74",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W60A9Z6K",
-    "address": "-",
-    "unique_id": "2bdb3152-b76e-4045-aa7e-dbf13e5bf010",
-    "unit_polygone": "חיפה",
-    "is_open": false,
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
   },
   {
     "device_serial": "R92TB0EY7NF",
     "address": "-",
     "unique_id": "1145ff4a-254b-470b-8fb3-60fa21e4ca78",
-    "unit_polygone": "חיפה",
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-נווה שאנן ורמות כרמל"
+    ],
     "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY7YW",
-    "address": "-",
-    "unique_id": "30ecd3ce-2a0c-458d-b63c-9fec52c49c9d",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA10S42F",
-    "address": "-",
-    "unique_id": "4bf5f8c3-96f9-4780-a1de-617b82c399dd",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W60AA0JB",
-    "address": "-",
-    "unique_id": "c8b11422-7f6b-42fe-b4ec-e5c66489fb1a",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA10SLFB",
-    "address": "-",
-    "unique_id": "eaf7818f-d9fa-46fd-98fb-0cf9c999afe3",
-    "unit_polygone": "חיפה",
-    "is_open": false,
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
   },
   {
     "device_serial": "R92TB0EYGWK",
     "address": "-",
     "unique_id": "a4e58a07-e5b5-4554-812d-19e4fe795c6d",
-    "unit_polygone": "חיפה",
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - קריית חיים ושמואל",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " קריית מוצקין",
+      " קריית ביאליק",
+      " קריית ים",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-קריית חיים ושמואל",
+      " חיפה-נווה שאנן ורמות כרמל",
+      " קריית מוצקין",
+      " קריית ביאליק",
+      " קריית ים"
+    ],
     "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0M678E",
-    "address": "-",
-    "unique_id": "07f6241b-b288-44b3-9c1b-7f3029a62c45",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W60AA3MH",
-    "address": "-",
-    "unique_id": "3a3e229b-77d8-4561-804d-efa4bc37e50f",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AT9R",
-    "address": "-",
-    "unique_id": "bf3669a8-52fd-4592-a61a-d833cd37ea92",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W700WSVN",
-    "address": "-",
-    "unique_id": "8cfa69ef-ed15-4e89-af11-fb25bce423ec",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W505SZND",
-    "address": "-",
-    "unique_id": "bf485958-1f97-466f-8f73-40dc5401c920",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EYEJJ",
-    "address": "-",
-    "unique_id": "5936a487-e244-4050-8bde-cd81e421ce11",
-    "unit_polygone": "חיפה",
-    "is_open": false,
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
   },
   {
     "device_serial": "R92TB0EY7QE",
     "address": "-",
     "unique_id": "d290b247-e63f-4a45-a720-75d7c67bfa4e",
-    "unit_polygone": "חיפה",
+    "unit_polygone": [
+      "חיפה - הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה - מערב",
+      " חיפה - מפרץ",
+      " חיפה - נווה שאנן ורמות כרמל",
+      " חיפה-הכרמל",
+      " הדר ועיר תחתית",
+      " חיפה-מערב",
+      " חיפה-מפרץ",
+      " חיפה-נווה שאנן ורמות כרמל"
+    ],
     "is_open": false,
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
     "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B6LN",
-    "address": "-",
-    "unique_id": "ae150a14-d1a6-4227-8ea9-39e409fa7261",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EYERB",
-    "address": "-",
-    "unique_id": "b5051bc0-268f-4746-8fbe-15c808b83188",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201ARTM",
-    "address": "-",
-    "unique_id": "7857737e-9663-45c1-9d69-391c106be397",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "bat-yam"
-  },
-  {
-    "device_serial": "R92W201B38F",
-    "address": "-",
-    "unique_id": "e3dcec6f-63f7-4fad-ae34-f5113d512f19",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "bat-yam"
-  },
-  {
-    "device_serial": "R92TA10SJVB",
-    "address": "-",
-    "unique_id": "59c29cb9-fd87-4ffd-ade2-7810f2e1ae7b",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "domain": "redport"
   }
 ]
 {
-  "timestamp": "13/11/2024, 10:37:26",
-  "unopened_units_count": 78
+  "timestamp": "13/11/2024, 16:57:44",
+  "unopened_units_count": 10
 }

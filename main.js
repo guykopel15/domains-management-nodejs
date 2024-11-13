@@ -169,6 +169,8 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
                 const red_alert_poligon_arr = red_alert_message.alert.data;
                 const poligon_unit_array = get_units_arr_that_match_poligon_alert(red_alert_poligon_arr, _domain_objs);
 
+                console.log(poligon_unit_array.length);
+
                 run_multiple_times_with_delay(poligon_unit_array, 3, 10 * 1000, _domain_objs).then(() => {
                     console.log('3 times done');
                     save_closed_units_to_file(_domain_objs, poligon_unit_array);
@@ -179,6 +181,53 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
 });
 
 ///////////////////////////////////// execute with delay ////////////////////////////////////////////
+function get_units_arr_that_match_poligon_alert(red_alert_polygons, domain_objs) {
+    let units = [];
+
+    const haifa_units = domain_objs['haifa'].units;
+    // console.log(JSON.stringify(haifa_units, null, 2));
+    // console.log(`Unit saved locations in Haifa: ${Object.values(haifa_units).map(unit => unit.saved_location)}`);
+
+    //loop domains dictionary
+    Object.values(domain_objs).forEach(domain_obj => {
+        for (const device_serial in domain_obj.units) {
+            const unit = domain_obj.units[device_serial];
+            if (!unit.is_active || !unit.saved_location || unit.saved_location === 'null')
+                continue;
+            
+            if (!is_part_of_polygon(unit.saved_location, red_alert_polygons))
+                continue;
+
+            units.push(unit);
+        }
+    });
+    console.log("array length => " +units.length);
+    return units;
+}
+
+function is_part_of_polygon(unit_saved_location, red_alert_polygons) {
+    // Ensure unit_saved_location is an array
+    const unit_saved_locations_array = Array.isArray(unit_saved_location) ? unit_saved_location : [unit_saved_location];
+    
+    // Helper function to normalize spaces
+    const normalize = (str) => str.replace(/\s+/g, ' ').trim();
+    
+    for (const location of unit_saved_locations_array) {
+        const formatted_location = normalize(location);
+
+        for (const alert_polygon of red_alert_polygons) {
+            const formatted_alert_polygon = normalize(alert_polygon);
+
+            // Check if either contains the other as a substring
+            if (formatted_location.includes(formatted_alert_polygon) || formatted_alert_polygon.includes(formatted_location)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
 async function execute_open_with_delay(need_to_open_unit_arr, domain_objs) {
     for (const unit of need_to_open_unit_arr) {
         const topic = unit.unique_id + '/' + OPEN_SAFEHOUSE_TOPIC;
@@ -206,7 +255,6 @@ function delay(ms) {
 
 function save_closed_units_to_file(domain_objs, poligon_unit_array) {
     const unopened_units = [];
-
     // Loop through poligon_unit_array to collect units that are still not open
     for (const unit of poligon_unit_array) {
         const domain_obj = domain_objs[unit.domain];
@@ -219,6 +267,8 @@ function save_closed_units_to_file(domain_objs, poligon_unit_array) {
                 unique_id: unit_in_domain.unique_id,
                 unit_polygone: unit_in_domain.saved_location || "-",
                 is_open: unit_in_domain.is_open,
+                local_id: unit_in_domain.local_id || "-",
+                unit_red_alert_polygons: unit_in_domain.red_alert_polygons || "-",
                 domain: unit_in_domain.domain
             });
         }
@@ -234,42 +284,6 @@ function save_closed_units_to_file(domain_objs, poligon_unit_array) {
     };
     fs.appendFileSync(file_path, `\n${JSON.stringify(summary, null, 2)}`, 'utf8');
     console.log(`Summary data appended to ${file_path}`);
-}
-
-function get_units_arr_that_match_poligon_alert(red_alert_polygons, domain_objs) {
-    let units = [];
-    //loop domains dictionary
-    Object.values(domain_objs).forEach(domain_obj => {
-        for (const device_serial in domain_obj.units) {
-            const unit = domain_obj.units[device_serial];
-            if (!unit.is_active || !unit.saved_location || !unit.red_alert_polygon)
-                continue;
-
-            if (!is_part_of_poligon(unit.saved_location, unit.red_alert_polygon, red_alert_polygons))
-                continue;
-
-            units.push(unit);
-        }
-    });
-
-    return units;
-}
-
-function is_part_of_poligon(unit_saved_location, unit_red_alert_polygon, red_alert_polygons) {
-    // ensure unit_saved_location is an array. (old version didn't use array for saved_location)
-    const unit_saved_locations_array =
-        Array.isArray(unit_saved_location) ? unit_saved_location : [unit_saved_location];
-
-    let is_inside_poligon = false;
-    for (const location of unit_saved_locations_array) {
-        if (!red_alert_polygons.includes(location) && !unit_red_alert_polygon.includes(location))
-            continue;
-
-        is_inside_poligon = true;
-        break
-    }
-
-    return is_inside_poligon;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
