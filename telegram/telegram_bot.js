@@ -1,20 +1,43 @@
 const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
-const FormData = require('form-data'); // Ensure this package is installed
+const FormData = require('form-data');
 
 // Telegram Bot Configuration
-const bot_token = '7827859045:AAE1qo4WrbD0qytLDAuzU8PtPGlNc_FDLWw';
-const chat_id = '5130398892';
-const telegram_api_url = `https://api.telegram.org/bot${bot_token}`;
+const TELEGRAM_BOT_TOKEN = '7827859045:AAE1qo4WrbD0qytLDAuzU8PtPGlNc_FDLWw';
+const TELEGRAM_CHAT_ID = '5130398892';
+const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
-// Function to send a document to Telegram
+async function send_text_message(message) {
+    const url = `${TELEGRAM_API_URL}/sendMessage`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+            console.log("Text message sent successfully to Telegram!");
+        } else {
+            console.error("Failed to send text message to Telegram:", data.description);
+        }
+    } catch (error) {
+        console.error("Error sending text message to Telegram:", error.message);
+    }
+}
+
 async function send_document(file_path) {
-    const url = `${telegram_api_url}/sendDocument`;
+    const url = `${TELEGRAM_API_URL}/sendDocument`;
     const formData = new FormData();
 
-    // Attach chat ID and the file
-    formData.append('chat_id', chat_id);
+    formData.append('chat_id', TELEGRAM_CHAT_ID);
     formData.append('document', fs.createReadStream(file_path));
 
     try {
@@ -23,7 +46,6 @@ async function send_document(file_path) {
             body: formData,
         });
 
-        // Parse the response from Telegram API
         const data = await response.json();
 
         if (data.ok) {
@@ -36,8 +58,7 @@ async function send_document(file_path) {
     }
 }
 
-// Function to save unopened units to a file and send it to Telegram
-function save_closed_units_to_file(domain_objs, poligon_unit_array) {
+async function save_closed_units_to_file(domain_objs, poligon_unit_array) {
     const unopened_units = [];
 
     try {
@@ -75,16 +96,23 @@ function save_closed_units_to_file(domain_objs, poligon_unit_array) {
         fs.appendFileSync(file_path, `\n${JSON.stringify(summary, null, 2)}`, 'utf8');
         console.log(`Summary data appended to ${file_path}`);
 
+        // Send individual text messages for each unopened unit
+        for (const unit of unopened_units) {
+            const message = `The unit ${unit.unique_id} in address ${unit.address} isn't open on the red alert.`;
+            await send_text_message(message); 
+        }
+
+        console.log("All text messages sent to Telegram.");
+
         // Send the file to Telegram
         console.log("Sending unopened units file to Telegram...");
-        send_document(file_path);
+        await send_document(file_path);
 
     } catch (error) {
         console.error("Error saving or sending unopened units file:", error.message);
     }
 }
 
-// Export the save_closed_units_to_file function
 module.exports = {
     save_closed_units_to_file
 };
