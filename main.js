@@ -210,13 +210,13 @@ function is_part_of_polygon(unit_saved_location, red_alert_polygons) {
     const unit_saved_locations_array = Array.isArray(unit_saved_location) ? unit_saved_location : [unit_saved_location];
     
     // Helper function to normalize spaces
-    const normalize = (str) => str.replace(/\s+/g, ' ').trim();
+    const format_location = (str) => str.replace(/\s+/g, ' ').trim();
     
     for (const location of unit_saved_locations_array) {
-        const formatted_location = normalize(location);
+        const formatted_location = format_location(location);
 
         for (const alert_polygon of red_alert_polygons) {
-            const formatted_alert_polygon = normalize(alert_polygon);
+            const formatted_alert_polygon = format_location(alert_polygon);
 
             // Check if either contains the other as a substring
             if (formatted_location.includes(formatted_alert_polygon) || formatted_alert_polygon.includes(formatted_location)) {
