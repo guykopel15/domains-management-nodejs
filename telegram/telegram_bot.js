@@ -87,7 +87,6 @@ async function notify_all_connected_users(message, file_path = null) {
         }
     }
 }
-
 function save_closed_units_to_file(domain_objs, poligon_unit_array) {
     const unopened_units = [];
     const unique_areas = new Set();
@@ -118,28 +117,28 @@ function save_closed_units_to_file(domain_objs, poligon_unit_array) {
         }
     }
 
-    const file_path = './closed_units.json';
-    fs.writeFileSync(file_path, JSON.stringify(unopened_units, null, 2), 'utf8');
+    const file_path = './closed_units.txt'; // Change file extension to .txt
 
-    // Build the message
+    // Build the file content
     const current_time = get_current_time_plus_offset();
     const unique_areas_list = Array.from(unique_areas).join(', ');
 
-    let message = `צבע אדום בשעה ${current_time} באזורים: ${unique_areas_list}\n\n`;
-    message += `היחידות שלא נפתחו באזורים:\n\n`;
+    let file_content = `צבע אדום בשעה ${current_time} באזורים: ${unique_areas_list}\n\n`;
+    file_content += `היחידות שלא נפתחו באזורים:\n\n`;
 
     for (const unit of unopened_units) {
-        message += `היחידה: ${unit.local}, מספר סידורי: ${unit.device_serial}, כתובת: ${unit.address}\n`;
+        file_content += `${unit.device_serial}, ${unit.local}, ${unit.address}, ${unit.domain}\n`;
     }
 
-    message += `\nכמות היחידות שלא נפתחו: ${unopened_units.length} מתוך ${poligon_unit_array.length}.\n`;
-    message += `תאריך ושעה: ${current_time}\n`;
+    file_content += `\nכמות היחידות שלא נפתחו: ${unopened_units.length} מתוך ${poligon_unit_array.length}.\n`;
+    file_content += `תאריך ושעה: ${current_time}\n`;
+
+    // Write content to a .txt file
+    fs.writeFileSync(file_path, file_content, 'utf8');
 
     // Send the message and the file
-    notify_all_connected_users(message, file_path);
+    notify_all_connected_users(file_content, file_path);
 }
-
-
 
 async function get_updates_from_telegram() {
     const url = `${TELEGRAM_API_URL}/getUpdates`;

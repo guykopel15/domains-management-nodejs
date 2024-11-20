@@ -202,20 +202,14 @@ function is_part_of_polygon(unit_saved_location, red_alert_polygons) {
 function get_units_arr_that_match_poligon_alert(red_alert_polygons, domain_objs) {
     const units = [];
     Object.values(domain_objs).forEach(domain_obj => {
-        // Log domain name and all units
-        // console.log(`Domain: ${domain_obj.get_domain_name()}`);
-        // console.log("Units: ", domain_obj.get_all_units());
-
         for (const device_serial in domain_obj.units) {
             const unit = domain_obj.units[device_serial];
             if (!unit.is_active || !unit.saved_location || unit.saved_location === 'null')
                 continue;
             
             if (is_part_of_polygon(unit.saved_location, red_alert_polygons)) {
-                console.log(`Matching Unit: ${JSON.stringify(unit, null, 2)}`);
                 units.push(unit);
             }
-            
         }
     });
 
