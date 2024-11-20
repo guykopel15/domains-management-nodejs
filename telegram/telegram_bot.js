@@ -62,49 +62,83 @@ async function notify_all_connected_users(message, file_path = null) {
         return;
     }
 
-    for (const { chat_id } of _chat_ids) {
-        await send_text_message(chat_id, message);
+    // Function to split the message into chunks
+    const split_message_into_chunks = (msg, chunk_size = 4000) => {
+        const chunks = [];
+        while (msg.length > 0) {
+            chunks.push(msg.substring(0, chunk_size));
+            msg = msg.substring(chunk_size);
+        }
+        return chunks;
+    };
 
+    // Split the message into manageable chunks
+    const message_chunks = split_message_into_chunks(message);
+
+    for (const { chat_id } of _chat_ids) {
+        // Send each chunk of the message
+        for (const chunk of message_chunks) {
+            await send_text_message(chat_id, chunk);
+        }
+
+        // Send the file if provided
         if (file_path) {
             await send_document(chat_id, file_path);
         }
     }
 }
 
-function save_closed_units_to_file(domain_objs, poligon_unit_array) {    
+function save_closed_units_to_file(domain_objs, poligon_unit_array) {
     const unopened_units = [];
+    const unique_areas = new Set();
+
     for (const unit of poligon_unit_array) {
         const domain_obj = domain_objs[unit.domain];
         const unit_in_domain = domain_obj && domain_obj.units[unit.device_serial];
-        if (!unit_in_domain.is_open && unit_in_domain) {
+        if (unit_in_domain && !unit_in_domain.is_open) {
             unopened_units.push({
                 device_serial: unit_in_domain.device_serial,
-                address: unit_in_domain.address || "-",
+                address: unit_in_domain.unit_address || "-",
                 unique_id: unit_in_domain.unique_id,
                 unit_polygone: unit_in_domain.saved_location || "-",
                 is_open: unit_in_domain.is_open,
-                local: unit_in_domain.local || "-",
+                local: unit_in_domain.unit_local_id || "-",
                 unit_red_alert_polygons: unit_in_domain.red_alert_polygons || "-",
                 domain: unit_in_domain.domain,
             });
         }
-    }
 
-    const haifa_units = domain_objs['haifa'].units;
-    console.log(haifa_units);
+        // Add area to the unique set
+        if (unit.saved_location) {
+            if (Array.isArray(unit.saved_location)) {
+                unit.saved_location.forEach(location => unique_areas.add(location));
+            } else {
+                unique_areas.add(unit.saved_location);
+            }
+        }
+    }
 
     const file_path = './closed_units.json';
     fs.writeFileSync(file_path, JSON.stringify(unopened_units, null, 2), 'utf8');
 
-    let message = 'יחידות שנשארו נעולות:\n';
+    // Build the message
+    const current_time = get_current_time_plus_offset();
+    const unique_areas_list = Array.from(unique_areas).join(', ');
+
+    let message = `צבע אדום בשעה ${current_time} באזורים: ${unique_areas_list}\n\n`;
+    message += `היחידות שלא נפתחו באזורים:\n\n`;
+
     for (const unit of unopened_units) {
         message += `היחידה: ${unit.local}, מספר סידורי: ${unit.device_serial}, כתובת: ${unit.address}\n`;
     }
-    message += `מספר היחידות הנעולות הוא: ${unopened_units.length} מתוך ${poligon_unit_array.length}.\n`;
-    message += `בתאריך: ${get_current_time_plus_offset()}`;
 
+    message += `\nכמות היחידות שלא נפתחו: ${unopened_units.length} מתוך ${poligon_unit_array.length}.\n`;
+    message += `תאריך ושעה: ${current_time}\n`;
+
+    // Send the message and the file
     notify_all_connected_users(message, file_path);
 }
+
 
 
 async function get_updates_from_telegram() {

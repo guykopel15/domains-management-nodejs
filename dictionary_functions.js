@@ -1,10 +1,11 @@
 const Units_Object = require('./units_obj');
 
-function upsert_dictionary(domain_units, units_as_mongo_dic) {
-    Object.values(units_as_mongo_dic).forEach(unit_as_mongo_dic => {
-        domain_units.upsert(unit_as_mongo_dic);
+function upsert_dictionary(domain_obj, full_units_dictionary) {
+    Object.entries(full_units_dictionary).forEach(([device_serial, unit_data]) => {
+        domain_obj.upsert(unit_data); 
     });
 }
+
 
 function delete_all_units_from_dictionary(units_obj) {
     for (const domain in units_obj) {

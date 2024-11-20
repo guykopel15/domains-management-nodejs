@@ -40,6 +40,11 @@ class Units_Object {
     }
 
     upsert(unit) {
+        const existing_unit = this.units[unit.device_serial];
+        if (existing_unit) {
+            unit.unit_address = existing_unit.unit_address || unit.unit_address || '-';
+            unit.unit_local_id = existing_unit.unit_local_id || unit.unit_local_id || '-';
+        }
         this.units[unit.device_serial] = unit;
     }
 

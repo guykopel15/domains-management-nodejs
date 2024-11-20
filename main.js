@@ -54,29 +54,34 @@ const _mysql_servers = [
 const _HEARTBEAT_THRESHOLD = 30000;
 
 const _domain_objs = {};
-let _localhost_mqtt_client = null;
+var _localhost_mqtt_client = null;
 
 async function main() {
     console.log('Starting main function...');
 
+    // Initialize domain objects
     _mysql_servers.forEach(server => {
         _domain_objs[server.name] = new Units_Object(server.name, {});
     });
 
+    // Initialize MQTT client
     _localhost_mqtt_client = new MqttClient_Obj(BOBO1_DOMAIN_NAME, LOCAL_BROKER_URL, 1883, LOCAL_SUBSCRIPTION_TOPICS);
 
+    // Process each MySQL server
     for (const mysql_server of _mysql_servers) {
         const db_units = await fetch_units_from_specific_sql_domain(mysql_server.host);
         const db_units_full_json = add_domain_name_to_the_db_units_json(db_units, mysql_server.name);
         const mongo_table = convert_mysql_row_to_mongo_rows(db_units_full_json);
         const domain_obj = _domain_objs[mysql_server.name];
-
-        upsert_dictionary(domain_obj, mongo_table);
+        const units_local_id_and_addresses_array = await fetch_ids_and_addresses_from_specific_sql_domain(mysql_server.host);
+        const full_units_dictionary = generate_dictionary_with_local_id_and_address(mongo_table, units_local_id_and_addresses_array);
+        upsert_dictionary(domain_obj, full_units_dictionary);
 
         handle_units_from_mongodb_into_the_dictionary(mongo_table);
         console.log(`Units from ${mysql_server.name} added to dictionary.`);
     }
 
+    // Initialize MQTT clients for domains
     for (const mysql_server of _mysql_servers) {
         const domain_obj = _domain_objs[mysql_server.name];
         const mqtt_broker = `mqtt://${mysql_server.host}`;
@@ -89,26 +94,18 @@ async function main() {
     interval_functions_every_30_seconds(_domain_objs);
 }
 
-function insert_dictionary_units_local_id(domain_obj, units_ids_array) {
+function generate_dictionary_with_local_id_and_address(domain_objs, units_local_id_and_addresses_array) {
     const updated_units = {};
-
-    for (const unit_key in domain_obj.units) {
-        const unit = { ...domain_obj.units[unit_key] };
-        unit.local = "-";
-        unit.address_id = "-";
-        for (const item of units_ids_array) {
-            if (item.ID !== unit.location_id) continue;
-            unit.local = item.Name;
-            unit.address_id = item.AddressID;
-            break;
-        }
-        updated_units[unit_key] = unit;
-    }
+    Object.values(domain_objs).forEach(unit => {
+        // Find the match in the units_local_id_and_addresses_array
+        const match_units = units_local_id_and_addresses_array.find(
+            item => item.DeviceSerial === unit.device_serial
+        );
+        unit.unit_address = match_units ? match_units.Address || '-' : '-';
+        unit.unit_local_id = match_units ? match_units.Name || '-' : '-';
+        updated_units[unit.device_serial] = unit;
+    });
     return updated_units;
-}
-
-function add_addresses_to_dictionary(db_units_with_addresses, domains_obj){
-
 }
 
 function interval_functions_every_30_seconds(domain_objs) {
@@ -160,8 +157,7 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
             const red_alert_message = JSON.parse(message.toString());
             const red_alert_poligon_arr = red_alert_message.alert.data;
             const poligon_unit_array = get_units_arr_that_match_poligon_alert(red_alert_poligon_arr, _domain_objs);
-            console.log(poligon_unit_array.length);
-
+            
             run_multiple_times_with_delay(poligon_unit_array, 3, 10 * 1000, _domain_objs).then(() => {
                 console.log('3 times done');
                 save_closed_units_to_file(_domain_objs, poligon_unit_array);
@@ -186,7 +182,6 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
 
 function is_part_of_polygon(unit_saved_location, red_alert_polygons) {
     const unit_saved_locations_array = Array.isArray(unit_saved_location) ? unit_saved_location : [unit_saved_location];
-
     const format_location = (str) => str.replace(/\s+/g, ' ').trim();
 
     for (const location of unit_saved_locations_array) {
@@ -207,15 +202,23 @@ function is_part_of_polygon(unit_saved_location, red_alert_polygons) {
 function get_units_arr_that_match_poligon_alert(red_alert_polygons, domain_objs) {
     const units = [];
     Object.values(domain_objs).forEach(domain_obj => {
+        // Log domain name and all units
+        // console.log(`Domain: ${domain_obj.get_domain_name()}`);
+        // console.log("Units: ", domain_obj.get_all_units());
+
         for (const device_serial in domain_obj.units) {
             const unit = domain_obj.units[device_serial];
-            if (!unit.is_active || !unit.saved_location || unit.saved_location === 'null') continue;
-
+            if (!unit.is_active || !unit.saved_location || unit.saved_location === 'null')
+                continue;
+            
             if (is_part_of_polygon(unit.saved_location, red_alert_polygons)) {
+                console.log(`Matching Unit: ${JSON.stringify(unit, null, 2)}`);
                 units.push(unit);
             }
+            
         }
     });
+
     console.log(`Array length => ${units.length}`);
     return units;
 }
