@@ -1,486 +1,193 @@
 [
   {
-    "device_serial": "R92W201AHQB",
+    "device_serial": "R92TB0EY86F",
     "address": "-",
-    "unique_id": "1c47bce1-efae-4aa3-8219-078565f3f10d",
-    "unit_polygone": "חיפה",
+    "unique_id": "81dc0d35-e638-420f-bf98-9341e97aea37",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201AK1J",
+    "device_serial": "R92TB0EY8DV",
     "address": "-",
-    "unique_id": "61e45bd7-3d2b-4d44-a0b2-f254c91e2e71",
-    "unit_polygone": "חיפה",
+    "unique_id": "0d5072fc-405d-4c47-b799-2c518d4fa222",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201ATAA",
+    "device_serial": "R92TB0EY7HY",
     "address": "-",
-    "unique_id": "7b156e02-e099-4385-a537-464d268511c7",
-    "unit_polygone": "חיפה",
+    "unique_id": "f41f6de7-043c-4a68-b624-6fb07ac95202",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201AVVJ",
+    "device_serial": "R92TB0EY7RT",
     "address": "-",
-    "unique_id": "bcb715b6-fcc5-4226-a74c-c1b94723c8eb",
-    "unit_polygone": "חיפה",
+    "unique_id": "928edf9e-27a4-4ee4-b53f-a32c09d04650",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201ATCE",
+    "device_serial": "R92TB0F0BPT",
     "address": "-",
-    "unique_id": "8e67efa2-16e7-4a41-a7da-aa947622d958",
-    "unit_polygone": "חיפה",
+    "unique_id": "929c8287-a735-454b-a618-1d0e76585c3c",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201ASEH",
+    "device_serial": "R92TA10S1PP",
     "address": "-",
-    "unique_id": "757755a4-04a3-4a63-aabf-4885cc2394bc",
-    "unit_polygone": "חיפה",
+    "unique_id": "448c1e9c-78d7-4dc8-a4a1-c2ea7588a3ba",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201B6KW",
+    "device_serial": "R92TA11ND9W",
     "address": "-",
-    "unique_id": "119e1f1d-12e0-4b9c-b80e-af4690eb2167",
-    "unit_polygone": "חיפה",
+    "unique_id": "30e9177d-2bf7-45a5-8d0c-c7b5eb96c291",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201B4NE",
+    "device_serial": "R92TB0EY85K",
     "address": "-",
-    "unique_id": "0b4fc312-2e21-489c-9690-750c6cfb7a77",
-    "unit_polygone": "חיפה",
+    "unique_id": "2852b61a-e046-4cc0-b47b-a399b27f8447",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201AMNY",
+    "device_serial": "R92W201AVGZ",
     "address": "-",
-    "unique_id": "e163c1a6-1a93-4c73-bbf3-4546c0f997dc",
-    "unit_polygone": "חיפה",
+    "unique_id": "5a7654fa-4a4e-4779-bd42-977541027b81",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201AEXE",
+    "device_serial": "R92W201ATTT",
     "address": "-",
-    "unique_id": "455011d3-ad09-4d41-9081-808e5ea7eae3",
-    "unit_polygone": "חיפה",
+    "unique_id": "8a1740a4-6027-4c6a-ace8-56b581a2017e",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92TA10RBQY",
+    "device_serial": "R92TB0EY7JH",
     "address": "-",
-    "unique_id": "ddaef0f5-5253-4ae7-b4e1-1863438feb0e",
-    "unit_polygone": "חיפה",
+    "unique_id": "926243bd-9ea9-48f3-add3-fcf3ea9a4c6a",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92TB0F0H5L",
+    "device_serial": "R92W201B71F",
     "address": "-",
-    "unique_id": "7637f651-8ae1-4d31-a4e2-2947c341a6ff",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
+    "unique_id": "6b5f2a76-ddf1-4b81-beb4-c9883f78b5df",
+    "unit_polygone": [
+      "אילת"
+    ],
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92TB0F0HJK",
+    "device_serial": "R92TB0EYFNY",
     "address": "-",
-    "unique_id": "45b64c00-ce85-4089-a0fa-de61ef5c7d10",
-    "unit_polygone": "חיפה",
+    "unique_id": "1f11c2ea-6ec0-4497-a63c-7ae7c47d9230",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92TB0EYEQF",
+    "device_serial": "R92TA10RZRX",
     "address": "-",
-    "unique_id": "f9f3432b-32c0-486d-947a-7eca92f2470d",
-    "unit_polygone": "חיפה",
+    "unique_id": "46532029-7dd1-4e1a-aba7-1eb1d80271a5",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92TB0EY51N",
+    "device_serial": "R92W201B35H",
     "address": "-",
-    "unique_id": "64f70c24-ca9a-4d36-b1d0-9c39e6c58f0c",
-    "unit_polygone": "חיפה",
+    "unique_id": "f40b8160-03ba-40eb-9454-593cd42c7dc1",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
+    "domain": "eilat"
   },
   {
-    "device_serial": "R92W201B1TD",
+    "device_serial": "R92W201B0RT",
     "address": "-",
-    "unique_id": "fcabbae8-f1a1-40cc-9c09-50ecbf4bbe27",
-    "unit_polygone": "חיפה",
+    "unique_id": "25639c39-0323-4049-9513-9f1458e2784c",
+    "unit_polygone": [
+      "אילת"
+    ],
     "is_open": false,
-    "local_id": "-",
+    "local": "-",
     "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AZAM",
-    "address": "-",
-    "unique_id": "8717f2cb-8954-41b7-9bd1-7661f8fafa15",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AY3A",
-    "address": "-",
-    "unique_id": "78905f0d-9d86-42d8-8de8-35b6238add75",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0NXRQT",
-    "address": "-",
-    "unique_id": "278007f0-bf59-46ee-9d5c-8757b14d8336",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0F0D5R",
-    "address": "-",
-    "unique_id": "fb54acb1-7525-44dd-a8e3-529f78f715ff",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B2JM",
-    "address": "-",
-    "unique_id": "9465a8a5-0778-497c-938d-6b6fd915a91e",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB01LNXZ",
-    "address": "-",
-    "unique_id": "3dc355a8-534e-4e79-ba72-2cdd6e4ad00e",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W60AA0DF",
-    "address": "-",
-    "unique_id": "15b05cab-427d-413f-9ff6-9df46f78655c",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B6JY",
-    "address": "-",
-    "unique_id": "65267683-cd18-430f-aea8-d8b74e4af555",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AZZH",
-    "address": "-",
-    "unique_id": "383b9cef-f4fc-4eb1-8965-03fe824e3f2f",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W505T0VH",
-    "address": "-",
-    "unique_id": "94e2fab3-cf23-43e5-9040-e73cab3e8d49",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W700WS6W",
-    "address": "-",
-    "unique_id": "54488b7d-5fe5-4a8b-a615-324666bd3797",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AVSN",
-    "address": "-",
-    "unique_id": "40659b3e-a9c5-4182-a7ef-81ed9d2fbd29",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B9FR",
-    "address": "-",
-    "unique_id": "825821ed-224b-44df-8498-4d5042622bf0",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EYF5Z",
-    "address": "-",
-    "unique_id": "ac5a36e9-6689-41d4-9ff3-a096c2001d75",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AS8V",
-    "address": "-",
-    "unique_id": "cb112282-09fe-466c-bf8d-496bc4a85729",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY7VX",
-    "address": "-",
-    "unique_id": "f4d710f8-0b85-479f-92ca-95040ea6d903",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA110GNV",
-    "address": "-",
-    "unique_id": "3470a187-714e-43d1-b28b-f507d3512a8d",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B1MF",
-    "address": "-",
-    "unique_id": "56f349c2-9941-461e-b1ba-d81fd0ec8608",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY7YW",
-    "address": "-",
-    "unique_id": "9e02b66b-8300-4335-979e-f25328fdaa52",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA1109AP",
-    "address": "-",
-    "unique_id": "b18b8ece-ec47-449e-a6c0-8d66c49a458f",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA10S42F",
-    "address": "-",
-    "unique_id": "d10d3781-91f4-4412-939c-5932043d0ce8",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TA10RM5N",
-    "address": "-",
-    "unique_id": "2903d995-dc6e-47cc-a7ab-8d07407cb593",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W60AA0JB",
-    "address": "-",
-    "unique_id": "bfd64cb5-4d02-41a8-9a51-fe635f7d3647",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY7TL",
-    "address": "-",
-    "unique_id": "9d5cb578-08d8-4d33-b96c-18d41b86af25",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0M678E",
-    "address": "-",
-    "unique_id": "55d5c2b3-fbe5-4410-9735-fffa181ef36b",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201AT9R",
-    "address": "-",
-    "unique_id": "00f2a91b-30f3-4615-90dc-65a2dbb15d37",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W505SZND",
-    "address": "-",
-    "unique_id": "3a771679-1590-4bf9-af98-b771275fb02d",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EYEJJ",
-    "address": "-",
-    "unique_id": "d0b62cc8-ba06-4297-a627-47d59ba2c4c4",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB0EY7QE",
-    "address": "-",
-    "unique_id": "996f3551-0913-40cc-a4aa-1d14e7ce6628",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B5DL",
-    "address": "-",
-    "unique_id": "f7d676a5-7752-495e-9341-4c01839b8f13",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92W201B38F",
-    "address": "-",
-    "unique_id": "e3dcec6f-63f7-4fad-ae34-f5113d512f19",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "bat-yam"
-  },
-  {
-    "device_serial": "R92TA10SJVB",
-    "address": "-",
-    "unique_id": "59c29cb9-fd87-4ffd-ade2-7810f2e1ae7b",
-    "unit_polygone": "חיפה",
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "redport"
+    "domain": "eilat"
   }
 ]
-{
-  "timestamp": "2024-11-18T14:21:26.422Z",
-  "unopened_units_count": 48
-}

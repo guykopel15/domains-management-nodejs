@@ -1,37 +1,8 @@
 [
   {
-    "device_serial": "R92W201ADMJ",
+    "device_serial": "R92W201AQHD",
     "address": "-",
-    "unique_id": "1e903e1c-b5af-4234-bf6b-c41c99e80d5c",
-    "unit_polygone": [
-      "חיפה - הכרמל",
-      " הדר ועיר תחתית",
-      " חיפה - מערב",
-      " חיפה - מפרץ",
-      " חיפה - קריית חיים ושמואל",
-      " חיפה - נווה שאנן ורמות כרמל",
-      " קריית מוצקין",
-      " קריית ביאליק",
-      " קריית ים",
-      " חיפה-הכרמל",
-      " הדר ועיר תחתית",
-      " חיפה-מערב",
-      " חיפה-מפרץ",
-      " חיפה-קריית חיים ושמואל",
-      " חיפה-נווה שאנן ורמות כרמל",
-      " קריית מוצקין",
-      " קריית ביאליק",
-      " קריית ים"
-    ],
-    "is_open": false,
-    "local_id": "-",
-    "unit_red_alert_polygons": "-",
-    "domain": "haifa"
-  },
-  {
-    "device_serial": "R92TB097J2H",
-    "address": "-",
-    "unique_id": "b7d5eeaa-7b5a-402c-b00d-c6de024b64f6",
+    "unique_id": "f3423745-cfab-4a4a-94f9-bd653e000ba4",
     "unit_polygone": [
       "חיפה - הכרמל",
       " הדר ועיר תחתית",
@@ -87,9 +58,9 @@
     "domain": "haifa"
   },
   {
-    "device_serial": "R92W60A9Z6K",
+    "device_serial": "R92TB0EYGWK",
     "address": "-",
-    "unique_id": "2bdb3152-b76e-4045-aa7e-dbf13e5bf010",
+    "unique_id": "a4e58a07-e5b5-4554-812d-19e4fe795c6d",
     "unit_polygone": [
       "חיפה - הכרמל",
       " הדר ועיר תחתית",
@@ -145,9 +116,9 @@
     "domain": "haifa"
   },
   {
-    "device_serial": "R92TB0EYGWK",
+    "device_serial": "R92W60A9Z6K",
     "address": "-",
-    "unique_id": "a4e58a07-e5b5-4554-812d-19e4fe795c6d",
+    "unique_id": "2bdb3152-b76e-4045-aa7e-dbf13e5bf010",
     "unit_polygone": [
       "חיפה - הכרמל",
       " הדר ועיר תחתית",
@@ -174,9 +145,9 @@
     "domain": "haifa"
   },
   {
-    "device_serial": "R92TB0EY1YD",
+    "device_serial": "R92W201ADMJ",
     "address": "-",
-    "unique_id": "e50cfa87-3bea-46ac-b947-018d236c26b6",
+    "unique_id": "1e903e1c-b5af-4234-bf6b-c41c99e80d5c",
     "unit_polygone": [
       "חיפה - הכרמל",
       " הדר ועיר תחתית",
@@ -206,6 +177,23 @@
     "device_serial": "R92W60AA7SX",
     "address": "-",
     "unique_id": "8498a001-ce2b-46a9-9a2a-4941ad05248b",
+    "unit_polygone": [
+      "קריית ים",
+      "קריית מוצקין",
+      "קריית ביאליק",
+      "קריית אתא",
+      "קריית חיים",
+      "קריית שמואל"
+    ],
+    "is_open": false,
+    "local_id": "-",
+    "unit_red_alert_polygons": "-",
+    "domain": "kiryat-yam"
+  },
+  {
+    "device_serial": "R92W504WPVT",
+    "address": "-",
+    "unique_id": "32a054d4-8fe5-42fb-84ce-ccfa84b3b8a2",
     "unit_polygone": [
       "קריית ים",
       "קריית מוצקין",
@@ -254,7 +242,3 @@
     "domain": "kiryat-yam"
   }
 ]
-{
-  "timestamp": "18/11/2024, 16:58:04",
-  "unopened_units_count": 10
-}

@@ -1,5 +1,3 @@
-const path = require('path');
-const fs = require('fs');
 const { save_closed_units_to_file } = require('./telegram/telegram_bot');
 
 const Units_Object = require('./units_obj');
@@ -8,6 +6,7 @@ const _emitter = require('./event_bus');
 
 const {
     fetch_units_from_specific_sql_domain,
+    fetch_ids_and_addresses_from_specific_sql_domain,
 } = require('./mysql_handling');
 
 const {
@@ -59,6 +58,7 @@ let _localhost_mqtt_client = null;
 
 async function main() {
     console.log('Starting main function...');
+
     _mysql_servers.forEach(server => {
         _domain_objs[server.name] = new Units_Object(server.name, {});
     });
@@ -72,6 +72,7 @@ async function main() {
         const domain_obj = _domain_objs[mysql_server.name];
 
         upsert_dictionary(domain_obj, mongo_table);
+
         handle_units_from_mongodb_into_the_dictionary(mongo_table);
         console.log(`Units from ${mysql_server.name} added to dictionary.`);
     }
@@ -86,6 +87,28 @@ async function main() {
     }
 
     interval_functions_every_30_seconds(_domain_objs);
+}
+
+function insert_dictionary_units_local_id(domain_obj, units_ids_array) {
+    const updated_units = {};
+
+    for (const unit_key in domain_obj.units) {
+        const unit = { ...domain_obj.units[unit_key] };
+        unit.local = "-";
+        unit.address_id = "-";
+        for (const item of units_ids_array) {
+            if (item.ID !== unit.location_id) continue;
+            unit.local = item.Name;
+            unit.address_id = item.AddressID;
+            break;
+        }
+        updated_units[unit_key] = unit;
+    }
+    return updated_units;
+}
+
+function add_addresses_to_dictionary(db_units_with_addresses, domains_obj){
+
 }
 
 function interval_functions_every_30_seconds(domain_objs) {
@@ -122,7 +145,8 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
         case HEARTBEAT_TOPIC:
             const units = JSON.parse(message.toString());
             for (const unit of units) {
-                if (unit.action !== 'heartbeat') continue;
+                if (unit.action !== 'heartbeat')
+                    continue;
 
                 const domain_obj = _domain_objs[unit.domain];
                 unit.is_active = true;
@@ -136,13 +160,26 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
             const red_alert_message = JSON.parse(message.toString());
             const red_alert_poligon_arr = red_alert_message.alert.data;
             const poligon_unit_array = get_units_arr_that_match_poligon_alert(red_alert_poligon_arr, _domain_objs);
-
             console.log(poligon_unit_array.length);
 
             run_multiple_times_with_delay(poligon_unit_array, 3, 10 * 1000, _domain_objs).then(() => {
                 console.log('3 times done');
                 save_closed_units_to_file(_domain_objs, poligon_unit_array);
             });
+            break;
+        case GENERAL_LOCK_ACKNOWLEDGE_TOPIC:
+            {
+                const units = JSON.parse(message.toString());
+                for (const incomming_unit of units) {
+                    const domain_name = incomming_unit.domain;
+                    const domain_obj = _domain_objs[domain_name];
+                    const unit = domain_obj.units[incomming_unit.device_serial];
+                    if (unit) {
+                        unit.lock_data = incomming_unit.extra_data;
+                        domain_obj.upsert(unit);
+                    }
+                }
+            }
             break;
     }
 });
@@ -195,8 +232,9 @@ async function run_multiple_times_with_delay(units_not_open, times, delay_betwee
 
 async function execute_open_with_delay(need_to_open_unit_arr, domain_objs) {
     for (const unit of need_to_open_unit_arr) {
-        const topic = `${unit.unique_id}/${OPEN_SAFEHOUSE_TOPIC}`;
-        console.log(`Opening unit ${unit.device_serial} with topic: ${topic}`);
+        const topic = unit.unique_id + '/' + OPEN_SAFEHOUSE_TOPIC;
+        console.log(`Opening unit ${unit.device_serial} with topic: ${topic} at domain ${unit.domain}`);
+        // domain_objs[unit.domain].publish_mqtt_message(topic, '1');
         await delay(100);
     }
 }
