@@ -1,77 +1,78 @@
-צבע אדום בשעה 20/11/2024, 15:59:55 באזורים: חיפה - הכרמל,  הדר ועיר תחתית,  חיפה - מערב,  חיפה - מפרץ,  חיפה - נווה שאנן ורמות כרמל,  חיפה-הכרמל,  חיפה-מערב,  חיפה-מפרץ,  חיפה-נווה שאנן ורמות כרמל, חיפה,  חיפה - קריית חיים ושמואל,  קריית מוצקין,  קריית ביאליק,  קריית ים,  חיפה-קריית חיים ושמואל
+‏צבע אדום בשעה 24/11/2024, 12:08:33 באזורים: חיפה
 
-היחידות שלא נפתחו באזורים:
+‏היחידות הפעילות שלא נפתחו באזורים:
 
-R92W201B3LZ, 086, המלך דוד 26, haifa
-R92TA110GNV, 066, קיבוץ גלויות 15, haifa
-R92TB0EYFEX, 068, קיסריה 4, haifa
-R92TA1109AP, 007, בנציון ישראלי 41, haifa
-R92TB0EY7VX, 041, ערד 37, haifa
-R92TB0EYEQF, 050, בן בבא 4, haifa
-R92W60AA3MH, 075, צפרירים 6, haifa
-R92W201AK1J, 011, דגניה 33, haifa
-R92TB0EY51N, 077, אלנבי 8, haifa
-R92W201AMNY, 002, אברבנאל 69, haifa
-R92W201AZAM, 103, שרה 10, haifa
-R92TB0EYF5Z, 067, קסל 9, haifa
-R92TA10RM5N, 024, יצחק יציב 46, haifa
-R92W201B5DL, 071, אל מהדי, haifa
-R92TB0EY7YW, 027, ברכה פולד 9, haifa
-R92W201B9FR, 026, קק״ל 1, haifa
-R92W201B1MF, 047, אשקלון 4, haifa
-R92TB0EY7TL, 052, השומר 3, haifa
-R92TB0EY7QE, 095, המגינים 119, haifa
-R92TB0F0H5L, 045, רזיאל 44, haifa
-R92W700W4CT, 078, אלנבי 72, haifa
-R92W60A9Z6K, 017, הנוטר 54, haifa
-R92W201ARPA, 059, יוסף 18, haifa
-R92W201B6JY, 055, הירדן 19, haifa
-R92TB0NYC2R, 037, הגיבורים 17, haifa
-R92TB01LNXZ, 054, הרצל 101, haifa
-R92W700WSVN, 053, הרצל 73, haifa
-R92TB0NXRQT, 064, הרב מרכוס 11, haifa
-R92TB0EYEJJ, 093, התקווה 23, haifa
-R92TA10S1XX, 082, בן גוריון 26, haifa
-R92W505T0VH, 012, שדרות דגניה 53ב, haifa
-R92W201ASJY, 040, חטיבת כרמלי 10, haifa
-R92W201AVVJ, 003, אנה פרנק 10, haifa
-R92TB0EYERB, 035, גורדון 34, haifa
-R92W700WH9Z, 102, צה"ל 51, haifa
-R92TB0F0GFK, 041, יד לבנים 4, haifa
-R92TA10S42F, 061, יודפת 11, haifa
-R92W201B3RP, 087, העליה השניה 20, haifa
-R92W201ATAA, 016, השקד 3, haifa
-R92TB0EYGWK, 013, שדרות דגניה 53ב, haifa
-R92W201B6LN, 063, בית שערים, haifa
-R92TB0F0D5R, 089, העליה השניה 45, haifa
-R92TA10S2YK, 092, הזית 22 א, haifa
-R92TB097J2H, 008, משמר העמק 19, haifa
-R92TB0NXXJB, 046, ארלוזורוב 19, haifa
-R92W700WKHF, 105, החשמל 8, haifa
-R92W201B6KW, 088, העליה השניה 25, haifa
-R92W201AY3A, 030, השר שטרית 28, haifa
-R92TB0971KV, 004, אנה פרנק 40, haifa
-R92TB0F0HJK, 033, ברל כצנלסון 29, haifa
-R92W201AQHD, 017א, הנוטר 54, haifa
-R92W201ADMJ, 022, חומה ומגדל 18, haifa
-R92TB0EY8FW, 025, יציב 24, haifa
-R92W201B1TD, 080, אל עתיקה 18, haifa
-R92W201AMQN, 019, השיירה 34, haifa
-R92W201B2JM, 001, אברבאנל 26, haifa
-R92W700WS6W, 039, חביבה רייך 3, haifa
-R92TA10RBQY, 070, שדרות הציונות 53, haifa
-R92W201B4NE, 085, המלך דוד 7, haifa
-R92W201AVSN, 104, ציקלג 8, haifa
-R92W201AJ5Z, 081, גוטליב שומאכר 2, haifa
-R92W60AA0DF, 098, יצחק שדה 26, haifa
-R92W201B06T, 044, קומוי 28, haifa
-R92TB0EY7NF, 083, הגדנע 5, haifa
-R92W201AHQB, 060, יוסף 47, haifa
-R92W201AW0Z, 094, הגנים 33, haifa
-R92TB0M678E, 069, שבתאי לוי 26, haifa
-R92TA10SLFB, 005, הארזים 62, haifa
-R92W201AJ4E, -, -, RM
-R92W201B38F, -, -, bat-yam
+‏WS6W,  039,  חביבה רייך 3,  haifa
+‏Y7VX,  041,  ערד 37,  haifa
+‏AMQN,  019,  השיירה 34,  haifa
+‏AHQB,  060,  יוסף 47,  haifa
+‏AK1J,  011,  דגניה 33,  haifa
+‏ATAA,  016,  השקד 3,  haifa
+‏ARGW,  043,  קומוי 4,  haifa
+‏B06T,  044,  קומוי 28,  haifa
+‏ATCE,  034,  בורכוב 25,  haifa
+‏ASEH,  006,  משמר העמק 10,  haifa
+‏ARPA,  059,  יוסף 18,  haifa
+‏B6KW,  088,  העליה השניה 25,  haifa
+‏B3LZ,  086,  המלך דוד 26,  haifa
+‏B4NE,  085,  המלך דוד 7,  haifa
+‏B3RP,  087,  העליה השניה 20,  haifa
+‏AXBY,  058,  טבריה 19,  haifa
+‏AMNY,  002,  אברבנאל 69,  haifa
+‏ADMJ,  022,  חומה ומגדל 18,  haifa
+‏AW0Z,  094,  הגנים 33,  haifa
+‏AEXE,  018,  פלוגות 54,  haifa
+‏RBQY,  070,  שדרות הציונות 53,  haifa
+‏S2YK,  092,  הזית 22 א,  haifa
+‏0H5L,  045,  רזיאל 44,  haifa
+‏S1XX,  082,  בן גוריון 26,  haifa
+‏0HJK,  033,  ברל כצנלסון 29,  haifa
+‏YFEX,  068,  קיסריה 4,  haifa
+‏YEQF,  050,  בן בבא 4,  haifa
+‏0GFK,  041,  יד לבנים 4,  haifa
+‏Y51N,  077,  אלנבי 8,  haifa
+‏AJ5Z,  081,  גוטליב שומאכר 2,  haifa
+‏B1TD,  080,  אל עתיקה 18,  haifa
+‏AZAM,  103,  שרה 10,  haifa
+‏AY3A,  030,  השר שטרית 28,  haifa
+‏XRQT,  064,  הרב מרכוס 11,  haifa
+‏7J2H,  008,  משמר העמק 19,  haifa
+‏AETR,  108,  זאב בנין 12,  haifa
+‏B2JM,  001,  אברבאנל 26,  haifa
+‏71KV,  004,  אנה פרנק 40,  haifa
+‏LNXZ,  054,  הרצל 101,  haifa
+‏A0DF,  098,  יצחק שדה 26,  haifa
+‏AZZH,  036,  הגליל 79,  haifa
+‏T0VH,  012,  שדרות דגניה 53ב,  haifa
+‏ASJY,  040,  חטיבת כרמלי 10,  haifa
+‏AVSN,  104,  ציקלג 8,  haifa
+‏B9FR,  026,  קק״ל 1,  haifa
+‏WH9Z,  102,  צה"ל 51,  haifa
+‏YF5Z,  067,  קסל 9,  haifa
+‏AS8V,  031,  אינטרנציונל 20,  haifa
+‏0GNV,  066,  קיבוץ גלויות 15,  haifa
+‏B1MF,  047,  אשקלון 4,  haifa
+‏Y8FW,  025,  יציב 24,  haifa
+‏9Z6K,  017,  הנוטר 54,  haifa
+‏Y7NF,  083,  הגדנע 5,  haifa
+‏Y7YW,  027,  ברכה פולד 9,  haifa
+‏09AP,  007,  בנציון ישראלי 41,  haifa
+‏S42F,  061,  יודפת 11,  haifa
+‏RM5N,  024,  יצחק יציב 46,  haifa
+‏Y7TL,  052,  השומר 3,  haifa
+‏SLFB,  005,  הארזים 62,  haifa
+‏YGWK,  013,  שדרות דגניה 53ב,  haifa
+‏A3MH,  075,  צפרירים 6,  haifa
+‏WSVN,  053,  הרצל 73,  haifa
+‏YEJJ,  093,  התקווה 23,  haifa
+‏Y7QE,  095,  המגינים 119,  haifa
+‏B5DL,  071,  אל מהדי,  haifa
+‏YERB,  035,  גורדון 34,  haifa
+‏YJAA,  023,  הקונגרס 43,  haifa
+‏XK8L,  null,  הרצליה 17,  haifa
+‏AJ4E,  -,  -,  RM
+‏B38F,  -,  -,  bat-yam
+‏SJVB,  -,  -,  redport
 
-כמות היחידות שלא נפתחו: 70 מתוך 97.
-תאריך ושעה: 20/11/2024, 15:59:55
+‏כמות היחידות שלא נפתחו: 71 מתוך 102.
+‏תאריך ושעה: 24/11/2024, 12:08:33

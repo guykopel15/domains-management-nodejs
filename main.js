@@ -160,7 +160,7 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
             
             run_multiple_times_with_delay(poligon_unit_array, 3, 10 * 1000, _domain_objs).then(() => {
                 console.log('3 times done');
-                save_closed_units_to_file(_domain_objs, poligon_unit_array);
+                save_closed_units_to_file(_domain_objs, poligon_unit_array, red_alert_poligon_arr);
             });
             break;
         case GENERAL_LOCK_ACKNOWLEDGE_TOPIC:
