@@ -32,7 +32,10 @@ class MqttClient_Obj {
     publish_mqtt_message(topic, message) {
         this.#_mqtt_client.publish(topic, message, (err) => {
             if (err) console.error(`Failed to publish message to topic "${topic}":`, err);
-            else console.log(`Message published to "${topic}":`, message);
+            else 
+            {
+                // console.log(`Message published to "${topic}":`, message);
+            }
         });
     }
 

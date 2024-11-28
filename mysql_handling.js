@@ -9,6 +9,8 @@ function create_mysql_connection(mysql_host) {
     });
 };
 
+
+//////////////////TODO: DO THOSE 2 FUNCTIONS IN 1/////////////////////////
 const SELECT_ALL_UNITS = 'SELECT * FROM Units';
 function fetch_units_from_specific_sql_domain(mysql_host) {
     const sql_connection = create_mysql_connection(mysql_host);
@@ -28,7 +30,6 @@ function execute_query(connection, query) {
         connection.query(query, (err, results) => {
             if (err) {
                 if (err.code === 'ER_NO_SUCH_TABLE') {
-                    console.log(`Table does not exist: ${err.sqlMessage}`);
                     return resolve([]);
                 }
                 return reject(err);

@@ -16,7 +16,6 @@ class Units_Object {
     init(domain_name, units_json_dict) {
         this.#domain_name = domain_name;
         const units_array = Object.values(units_json_dict);
-
         units_array.forEach(item => {
             item.is_active = false;
             this.upsert(item);
@@ -42,12 +41,18 @@ class Units_Object {
     upsert(unit) {
         const existing_unit = this.units[unit.device_serial];
         if (existing_unit) {
-            unit.unit_address = existing_unit.unit_address || unit.unit_address || '-';
-            unit.unit_local_id = existing_unit.unit_local_id || unit.unit_local_id || '-';
+            unit = {
+                ...existing_unit,             
+                ...unit,                      
+                unit_address: unit.unit_address || existing_unit.unit_address || '-', 
+                unit_local_id: unit.unit_local_id || existing_unit.unit_local_id || '-',
+                unit_system_type: unit.system_type_id === 1 ? 'panic-control' : 'safehouse',
+            };
         }
         this.units[unit.device_serial] = unit;
     }
-
+    
+    
     update_non_active_count() {
         const last_count = this.#non_active_units;
         this.#non_active_units = 0;

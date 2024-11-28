@@ -13,7 +13,6 @@ const {
 const TELEGRAM_BOT_TOKEN = '7827859045:AAE1qo4WrbD0qytLDAuzU8PtPGlNc_FDLWw';
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 
-// MongoDB Connection Helper
 async function connect_to_mongodb() {
     const client = new MongoClient(MONGO_DB_URL);
     await client.connect();
@@ -22,7 +21,6 @@ async function connect_to_mongodb() {
     return { client, collection };
 }
 
-// Save Chat ID to MongoDB
 async function save_user_chat_id(chat_id, username) {
     const { client, collection } = await connect_to_mongodb();
     const existing_chat = await collection.findOne({ chat_id });
@@ -36,10 +34,6 @@ async function get_all_users_chat_ids() {
     const { client, collection } = await connect_to_mongodb();
     const chat_ids = await collection.find({}).toArray();
     return chat_ids.map(doc => doc.chat_id);
-}
-
-function get_current_time_plus_offset(hours = 2) {
-    return new Date(Date.now() + hours * 60 * 60 * 1000).toLocaleString('en-IL', { hour12: false });
 }
 
 async function send_text_message(chat_id, message) {
@@ -87,7 +81,6 @@ async function send_document(chat_id, file_path) {
     }
 }
 
-// Notify All Users with a Message and File
 async function notify_all_connected_users(message, file_path = null) {
     const chat_ids = await get_all_users_chat_ids();
 
@@ -118,50 +111,6 @@ async function notify_all_connected_users(message, file_path = null) {
     }
 }
 
-// Format Units Message Text
-function units_text_format(red_alert_poligon_arr, poligon_unit_array, unopened_units) {
-    const current_time = get_current_time_plus_offset();
-
-    let file_content = `\u200Fצבע אדום בשעה ${current_time} באזורים: ${red_alert_poligon_arr.join(', ')}\n\n`;
-    file_content += `\u200Fהיחידות הפעילות שלא נפתחו באזורים:\n\n`;
-
-    for (const unit of unopened_units) {
-        file_content += `\u200F${unit.local},  ${unit.device_serial.slice(-4)},  ${unit.address},  ${unit.domain}\n`;
-    }
-
-    file_content += `\n\u200Fכמות היחידות שלא נפתחו: ${unopened_units.length} מתוך ${poligon_unit_array.length}.\n`;
-    file_content += `\u200Fתאריך ושעה: ${current_time}\n`;
-
-    return file_content;
-}
-
-// Save Unopened Units to File and Notify Users
-function save_closed_units_to_file(domain_objs, poligon_unit_array, red_alert_poligon_arr) {
-    const unopened_units = [];
-
-    for (const unit of poligon_unit_array) {
-        const domain_obj = domain_objs[unit.domain];
-        const unit_in_domain = domain_obj && domain_obj.units[unit.device_serial];
-        if (unit_in_domain && !unit_in_domain.is_open) {
-            unopened_units.push({
-                device_serial: unit_in_domain.device_serial,
-                address: unit_in_domain.unit_address || "-",
-                unique_id: unit_in_domain.unique_id,
-                local: unit_in_domain.unit_local_id || "-",
-                domain: unit_in_domain.domain,
-            });
-        }
-    }
-
-    const file_content = units_text_format(red_alert_poligon_arr, poligon_unit_array, unopened_units);
-
-    const file_path = './closed_units.txt';
-    fs.writeFileSync(file_path, file_content, 'utf8');
-
-    notify_all_connected_users(file_content, file_path);
-}
-
-// Process Updates from Telegram and Save Chat IDs
 async function get_updates_from_telegram() {
     const url = `${TELEGRAM_API_URL}/getUpdates`;
 
@@ -193,7 +142,6 @@ async function get_updates_from_telegram() {
     }
 }
 
-// Main Function
 async function main() {
     console.log("Starting Telegram bot...");
     const users_chat_ids = await get_all_users_chat_ids();
@@ -208,5 +156,5 @@ async function main() {
 main()
 
 module.exports = {
-    save_closed_units_to_file
+    notify_all_connected_users
 };
