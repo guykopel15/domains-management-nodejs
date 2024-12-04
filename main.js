@@ -3,6 +3,7 @@ const MqttClient_Obj = require('./mqtt_client');
 const _emitter = require('./event_bus');
 
 const {notify_all_connected_users } = require('./telegram/telegram_bot');
+const {save_closed_units_to_file} = require('./handle_files');
 
 const {
     fetch_units_from_specific_sql_domain,
@@ -90,7 +91,6 @@ async function main() {
     }
 
     interval_functions_every_40_seconds(_domain_objs);
-    test1();
 }
 
 function generate_dictionary_with_local_id_and_address(domain_objs, units_local_id_and_addresses_array) {
@@ -131,15 +131,6 @@ function interval_functions_every_40_seconds(domain_objs) {
     }, 40 * 1000);
 }
 
-function test1() {
-    setInterval(async () => {
-        
-        if("haifa" in _domain_objs)
-            console.log("haifa active count =>" + _domain_objs['haifa'].active_units_count);
-
-    }, 10 * 1000);
-}
-
 function set_non_active_units(domain_objects) {
     for (const domain_obj of Object.values(domain_objects)) {
         domain_obj.check_non_active_units_and_get_domain_units_state(_HEARTBEAT_THRESHOLD);
@@ -174,7 +165,6 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
                 const [file_content, file_path] = save_closed_units_to_file(_domain_objs, poligon_unit_array, red_alert_poligon_arr);
                 notify_all_connected_users(file_content, file_path);
 
-                // console.log('run_multiple_times_with_delay -> ' + poligon_unit_array.length + ' ' + red_alert_poligon_arr);
             });
 
             break;
@@ -188,7 +178,7 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
                     const unit = domain_obj.units[incomming_unit.device_serial];
                     if (unit) {
                         unit.lock_data = incomming_unit.extra_data;
-                        // domain_obj.upsert(unit);
+                        domain_obj.upsert(unit);
                     }
                 }
             }
@@ -196,7 +186,6 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
     }
 });
 
-//////////to do the true false also on unit_red_alert_polygons/////////////
 function is_part_of_polygon(unit_polygons, red_alert_polygons) {
     const unit_polygons_array = Array.isArray(unit_polygons) ? unit_polygons : [unit_polygons];
 
@@ -224,13 +213,12 @@ function get_units_arr_that_match_poligon_alert(red_alert_polygons, domain_objs)
             const unit = domain_obj.units[device_serial];
             if (!unit.is_active || (!unit.saved_location && !unit.red_alert_polygon) || unit.saved_location === 'null')
                 continue;
-
+            
             if (is_part_of_polygon(unit.saved_location, red_alert_polygons) || is_part_of_polygon(unit.red_alert_polygon, red_alert_polygons)) {
                 units.push(unit);
             }
         }
     });
-
     console.log(`Array length => ${units.length}`);
     return units;
 }
@@ -241,13 +229,14 @@ async function run_multiple_times_with_delay(units_not_open, times, delay_betwee
         if (i < times - 1) {
             await delay(delay_between_runs);
         }
+        console.log(`Run number ${i + 1} completed.`);
     }
 }
 
 async function execute_open_with_delay(need_to_open_unit_arr, domain_objs) {
     for (const unit of need_to_open_unit_arr) {
         const topic = unit.unique_id + '/' + OPEN_SAFEHOUSE_TOPIC;
-        domain_objs[unit.domain].publish_mqtt_message(topic, '1');
+        // domain_objs[unit.domain].publish_mqtt_message(topic, '1');
         await delay(100);
     }
 }
@@ -256,47 +245,4 @@ function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function units_text_format(red_alert_poligon_arr, poligon_unit_array, unopened_units) {
-    const current_time = get_current_time_plus_offset();
-
-    let file_content = `\u200Fצבע אדום בשעה ${current_time} באזורים: ${red_alert_poligon_arr.join(', ')}\n\n`;
-    file_content += `\u200Fהיחידות הפעילות שלא נפתחו באזורים:\n\n`;
-
-    for (const unit of unopened_units) {
-        file_content += `\u200F${unit.local},  ${unit.device_serial.slice(-4)},  ${unit.address},  ${unit.domain}\n`;
-    }
-
-    file_content += `\n\u200Fכמות היחידות שלא נפתחו: ${unopened_units.length} מתוך ${poligon_unit_array.length}.\n`;
-    file_content += `\u200Fתאריך ושעה: ${current_time}\n`;
-
-    return file_content;
-}
-
-function save_closed_units_to_file(domain_objs, poligon_unit_array, red_alert_poligon_arr) {
-    const unopened_units = [];
-
-    for (const unit of poligon_unit_array) {
-        const domain_obj = domain_objs[unit.domain];
-        const unit_in_domain = domain_obj && domain_obj.units[unit.device_serial];
-        if (unit_in_domain && !unit_in_domain.is_open) {
-            unopened_units.push({
-                device_serial: unit_in_domain.device_serial,
-                address: unit_in_domain.unit_address || "-",
-                unique_id: unit_in_domain.unique_id,
-                local: unit_in_domain.unit_local_id || "-",
-                domain: unit_in_domain.domain,
-            });
-        }
-    }
-
-    const file_content = units_text_format(red_alert_poligon_arr, poligon_unit_array, unopened_units);
-
-    const file_path = './closed_units.txt';
-    fs.writeFileSync(file_path, file_content, 'utf8');
-    return [file_content, file_path];    
-}
-
-function get_current_time_plus_offset(hours = 2) {
-    return new Date(Date.now() + hours * 60 * 60 * 1000).toLocaleString('en-IL', { hour12: false });
-}
 main();

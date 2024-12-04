@@ -1,7 +1,7 @@
-const fs = require('fs');
 const fetch = require('node-fetch');
 const FormData = require('form-data');
 const { MongoClient } = require('mongodb');
+const fs = require('fs');
 
 const {
     MONGO_DB_URL,
