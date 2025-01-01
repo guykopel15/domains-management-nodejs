@@ -19,6 +19,8 @@ class MqttClient_Obj {
         this.#_mqtt_client.on('error', this.handle_mqtt_error);
     }
 
+    
+
     #subscribe_after_connect(mqtt_client, subscription_topics) {
         console.log(`Connected to MQTT broker at ${this.domain_name}`);
         for (const topic of subscription_topics) {

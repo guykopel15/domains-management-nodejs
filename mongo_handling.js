@@ -92,11 +92,50 @@ function add_domain_name_to_the_db_units_json(db_units, domain_name) {
     return db_units.map(unit => ({ ...unit, domain: domain_name }));
 }
 
+async function add_to_mongo(dictionary) {
+    const client = new MongoClient(MONGO_DB_URL);
+
+    try {
+        await client.connect();
+        const db = client.db(MONGO_DB_DATABASE);
+        const collection = db.collection(MONGO_UNIT_COLLECTION_NAME);
+
+        // Insert the dictionary into the collection
+        await collection.insertOne(dictionary);
+
+    } catch (err) {
+        console.error('Error adding dictionary to MongoDB:', err);
+    }
+}
+
+async function get_all_data_from_mongo() {
+    const client = new MongoClient(MONGO_DB_URL);
+
+    try {
+        await client.connect();
+        const db = client.db(MONGO_DB_DATABASE);
+        const collection = db.collection(MONGO_UNIT_COLLECTION_NAME);
+
+        // Fetch all documents from the collection
+        const all_data = await collection.find({}).toArray();
+
+        console.log('Data from MongoDB:', all_data);
+        return all_data; // Return the data if needed elsewhere
+    } catch (err) {
+        console.error('Error fetching data from MongoDB:', err);
+    } finally {
+        await client.close();
+        console.log('MongoDB connection closed');
+    }
+}
+
 module.exports = {
     get_units_from_mongodb_and_insert_to_the_dictionary,
     handle_units_from_mongodb_into_the_dictionary,
     delete_all_data_from_mongodb,
     convert_mysql_row_to_mongo_rows: convert_mysql_units_rows_to_dic,
     convert_mysql_table_name_to_mongo_naming,
-    add_domain_name_to_the_db_units_json
+    add_domain_name_to_the_db_units_json,
+    get_all_data_from_mongo,
+    add_to_mongo
 };

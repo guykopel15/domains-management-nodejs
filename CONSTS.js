@@ -1,9 +1,9 @@
-
 const LOCAL_BROKER_URL = 'mqtt://127.0.0.1';
 const BOBO1_DOMAIN_NAME = 'bobo';
 const HEARTBEAT_TOPIC = 'internal-general-heartbeat';
 const RED_ALERT_NOTIFY_TOPIC = 'red-alert-notify';
 const OPEN_SAFEHOUSE_TOPIC = 'lock-open';
+const CLOSE_SAFEHOUSE_TOPIC = 'lock-close';
 const GENERAL_LOCK_ACKNOWLEDGE_TOPIC = 'internal-lock-acknowledge';
 
 const LOCAL_SUBSCRIPTION_TOPICS = [
@@ -15,8 +15,10 @@ const LOCAL_SUBSCRIPTION_TOPICS = [
 
 const MONGO_DB_URL = 'mongodb://localhost:27017';
 const MONGO_DB_DATABASE = 'unit_management';
-const MONGO_DB_TELEGRAM_USERS_DATABASE= "telegram_users";
+const MONGO_DB_TELEGRAM_USERS_DATABASE = 'telegram_users';
 const MONGO_DB_TELEGRAM_USERS_COLLECTION_NAME = 'chat_ids';
+const MONGO_DB_BOTS_DATABASE = 'telegram_bots'; 
+const MONGO_DB_BOTS_COLLECTION_NAME = 'bots';   
 const MONGO_UNIT_COLLECTION_NAME = 'units';
 
 const MYSQL_SERVERS = [
@@ -40,8 +42,6 @@ const MYSQL_SERVERS = [
     { name: 'redport', host: '34.0.70.52', url: 'redport.admin.netiotil.com' }
 ];
 
-
-
 module.exports = {
     HEARTBEAT_TOPIC,
     MONGO_DB_URL,
@@ -54,6 +54,9 @@ module.exports = {
     LOCAL_SUBSCRIPTION_TOPICS,
     MONGO_DB_TELEGRAM_USERS_DATABASE,
     MONGO_DB_TELEGRAM_USERS_COLLECTION_NAME,
+    MONGO_DB_BOTS_DATABASE, 
+    MONGO_DB_BOTS_COLLECTION_NAME, 
     BOBO1_DOMAIN_NAME,
-    MYSQL_SERVERS
+    MYSQL_SERVERS,
+    CLOSE_SAFEHOUSE_TOPIC
 };

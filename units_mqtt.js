@@ -2,6 +2,7 @@ const MqttClient_Obj = require('./mqtt_client');
 const { MYSQL_SERVERS, HEARTBEAT_TOPIC } = require('./CONSTS');
 const emitter = require('./event_bus');
 
+// Shared units array
 var _units_array = [];
 
 async function main() {
@@ -13,7 +14,7 @@ async function main() {
 
 function initialize_mqtt_clients() {
     MYSQL_SERVERS.forEach((server) => {
-        const mqtt_client_obj = new MqttClient_Obj(
+        new MqttClient_Obj(
             server.name,
             `mqtt://${server.host}`,
             1883,
@@ -41,6 +42,9 @@ function start_returning_messages() {
         console.log(_units_array);
     }, 5000);
 }
+
+// Export the units array for external use
+module.exports = { _units_array };
 
 main().catch((error) => {
     console.error('Error in main function:', error);

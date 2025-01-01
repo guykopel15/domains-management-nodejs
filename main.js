@@ -1,9 +1,7 @@
 const Units_Object = require('./units_obj');
 const MqttClient_Obj = require('./mqtt_client');
 const _emitter = require('./event_bus');
-
-const {notify_all_connected_users } = require('./telegram/telegram_bot');
-const {save_closed_units_to_file} = require('./handle_files');
+const { notify_all_connected_users } = require('./telegram/telegram_bot');
 
 const {
     fetch_units_from_specific_sql_domain,
@@ -14,6 +12,8 @@ const {
     handle_units_from_mongodb_into_the_dictionary,
     convert_mysql_row_to_mongo_rows,
     add_domain_name_to_the_db_units_json,
+    get_all_data_from_mongo,
+    add_to_mongo
 } = require('./mongo_handling');
 
 const {
@@ -28,6 +28,7 @@ const {
     LOCAL_SUBSCRIPTION_TOPICS,
     BOBO1_DOMAIN_NAME,
     OPEN_SAFEHOUSE_TOPIC,
+    CLOSE_SAFEHOUSE_TOPIC
 } = require('./CONSTS');
 
 // List of domains and their respective IP addresses
@@ -70,14 +71,27 @@ async function main() {
 
     // Process each MySQL server
     for (const mysql_server of _mysql_servers) {
+
         const db_units = await fetch_units_from_specific_sql_domain(mysql_server.host);
+
         const db_units_full_json = add_domain_name_to_the_db_units_json(db_units, mysql_server.name);
+
         const mongo_table = convert_mysql_row_to_mongo_rows(db_units_full_json);
+
         const domain_obj = _domain_objs[mysql_server.name];
+
+        domain_obj.set_domain_name(mysql_server.name);
+
         const units_local_id_and_addresses_array = await fetch_ids_and_addresses_from_specific_sql_domain(mysql_server.host);
+
         const full_units_dictionary = generate_dictionary_with_local_id_and_address(mongo_table, units_local_id_and_addresses_array);
+
         upsert_dictionary(domain_obj, full_units_dictionary);
+
+        add_to_mongo(domain_obj);
+
         handle_units_from_mongodb_into_the_dictionary(mongo_table);
+
         console.log(`Units from ${mysql_server.name} added to dictionary.`);
     }
 
@@ -90,26 +104,10 @@ async function main() {
         console.log(`MQTT client for ${mysql_server.name} created.`);
     }
 
-    interval_functions_every_40_seconds(_domain_objs);
+    interval_functions_every_60_seconds(_domain_objs);
 }
 
-function generate_dictionary_with_local_id_and_address(domain_objs, units_local_id_and_addresses_array) {
-    const updated_units = {};
-    Object.values(domain_objs).forEach(unit => {
-        // Find the match in the units_local_id_and_addresses_array
-        const match_units = units_local_id_and_addresses_array.find(
-            item => item.DeviceSerial === unit.device_serial
-        );
-
-        unit.unit_address = match_units ? match_units.Address || '-' : '-';
-        unit.unit_local_id = match_units ? match_units.Name || '-' : '-';
-        unit.unit_system_type = unit.system_type_id === 1 ? 'panic-control' : 'safehouse';
-        updated_units[unit.device_serial] = unit;
-    });
-    return updated_units;
-}
-
-function interval_functions_every_40_seconds(domain_objs) {
+function interval_functions_every_60_seconds(domain_objs) {
     setInterval(async () => {
         for (const mysql_server of _mysql_servers) {
             const mysql_all_units = await fetch_units_from_specific_sql_domain(mysql_server.host);
@@ -121,30 +119,71 @@ function interval_functions_every_40_seconds(domain_objs) {
 
             const units_as_dic = convert_mysql_row_to_mongo_rows(db_units_full_json);
             const domain_obj = domain_objs[mysql_server.name];
-
             set_non_active_units(domain_objs);
             upsert_dictionary(domain_obj, units_as_dic);
             handle_units_from_mongodb_into_the_dictionary(units_as_dic);
 
-            // console.log(`Units from ${mysql_server.name} updated.`);
+            if (!domain_obj.is_time_to_execute_and_send_report()) {
+                console.log(`Skipping report for domain ${mysql_server.name}`);
+                continue;
+            }
+
+            console.log(`It's time to execute and send report for domain ${mysql_server.name}`);
+            let full_message = `בדיקה יומית של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
+
+            const units_in_domain = Object.values(domain_obj.units);
+            const domain_objs_array = Object.values(domain_objs);
+
+            // Open all units
+            await run_multiple_times_with_delay(units_in_domain, 3, 10 * 1000, domain_objs_array, "open");
+            console.log(`All units opened for domain ${mysql_server.name}`);
+            const close_units = domain_obj.get_all_open_or_close_units("close");
+
+            // Close all units
+            await run_multiple_times_with_delay(units_in_domain, 3, 10 * 1000, domain_objs_array, "close");
+            console.log(`All units closed for domain ${mysql_server.name}`);
+            const open_units = domain_obj.get_all_open_or_close_units("open");
+
+            // Identify faulty units
+            const faulty_units = units_in_domain.filter(
+                unit => !open_units.includes(unit) && !close_units.includes(unit)
+            );
+
+            // Build the report message
+            full_message += `דומיין: ${mysql_server.name}\n`;
+            full_message += `יחידות תקולות:\nבל היחידות שגם לא נפתחו בפתיחה וגם לא נסגרו בסגירה:\n`;
+            full_message += `${generate_units_summary_message(faulty_units)}\n`;
+            full_message += `\nסיכום דו"ח של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
+            full_message += `כמות היחידות התקולות: ${faulty_units.length} מתוך ${units_in_domain.length}\n`;
+
+            notify_all_connected_users(full_message, domain_obj.get_domain_name());
+            console.log(`Report sent and last_report_time updated for domain ${mysql_server.name}`);
         }
-    }, 40 * 1000);
+    }, 60 * 1000);
 }
 
-function set_non_active_units(domain_objects) {
-    for (const domain_obj of Object.values(domain_objects)) {
-        domain_obj.check_non_active_units_and_get_domain_units_state(_HEARTBEAT_THRESHOLD);
+function generate_units_summary_message(units_array) {
+    if (units_array.length === 0) {
+        return "אין יחידות תקולות במצב זה.\n";
     }
+
+    let message = "";
+    for (const unit of units_array) {
+        message += `‏${unit.unit_local_id || "-"}, ${unit.device_serial.slice(-4)}, ${unit.address || "-"}, ${unit.domain}\n`;
+    }
+    return message;
 }
 
 _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
     switch (topic) {
         case HEARTBEAT_TOPIC:
+            console.log(topic);
             const units = JSON.parse(message.toString());
             for (const unit of units) {
+                console.log(unit);
                 if (unit.action !== 'heartbeat')
                     continue;
-                
+
                 const domain_obj = _domain_objs[unit.domain];
                 unit.is_active = true;
                 domain_obj.upsert(unit);
@@ -157,16 +196,16 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
             console.log('Red alert notify received');
             const red_alert_message = JSON.parse(message.toString());
             const red_alert_poligon_arr = red_alert_message.alert.data;
-            const poligon_unit_array = get_units_arr_that_match_poligon_alert(red_alert_poligon_arr, _domain_objs);
-            // console.log("poligon_unit_array.length " + poligon_unit_array.length);
+            const poligon_units_array = get_units_arr_that_match_poligon_alert(red_alert_poligon_arr, _domain_objs);
+            console.log(red_alert_poligon_arr);
+            // console.log(poligon_units_array);
 
-            run_multiple_times_with_delay(poligon_unit_array, 3, 10 * 1000, _domain_objs).then(() => {
-                
-                const [file_content, file_path] = save_closed_units_to_file(_domain_objs, poligon_unit_array, red_alert_poligon_arr);
-                notify_all_connected_users(file_content, file_path);
-
-            });
-
+            // const polygon_unit_domain = poligon_units_array[0][0].domain;
+            // run_multiple_times_with_delay(poligon_units_array, 3, 10 * 1000, _domain_objs, "open").then(() => {
+            //     const close_units = _domain_objs[polygon_unit_domain].get_all_open_or_close_units("close");
+            //     const file_content = generate_red_alert_message(red_alert_poligon_arr, close_units, poligon_units_array);
+            //     notify_all_connected_users(file_content, polygon_unit_domain);
+            // });
             break;
 
         case GENERAL_LOCK_ACKNOWLEDGE_TOPIC:
@@ -213,29 +252,33 @@ function get_units_arr_that_match_poligon_alert(red_alert_polygons, domain_objs)
             const unit = domain_obj.units[device_serial];
             if (!unit.is_active || (!unit.saved_location && !unit.red_alert_polygon) || unit.saved_location === 'null')
                 continue;
-            
+
+            if(unit.domain === 'sderot')
+                
             if (is_part_of_polygon(unit.saved_location, red_alert_polygons) || is_part_of_polygon(unit.red_alert_polygon, red_alert_polygons)) {
                 units.push(unit);
             }
         }
     });
+    
     console.log(`Array length => ${units.length}`);
     return units;
 }
 
-async function run_multiple_times_with_delay(units_not_open, times, delay_between_runs, domain_objs) {
+async function run_multiple_times_with_delay(units_not_open, times, delay_between_runs, domain_objs, action) {
     for (let i = 0; i < times; i++) {
-        await execute_open_with_delay(units_not_open, domain_objs);
+        await execute_open_with_delay(units_not_open, domain_objs, action);
         if (i < times - 1) {
             await delay(delay_between_runs);
         }
-        console.log(`Run number ${i + 1} completed.`);
     }
 }
 
-async function execute_open_with_delay(need_to_open_unit_arr, domain_objs) {
+async function execute_open_with_delay(need_to_open_unit_arr, domain_objs, action) {
+    const topic_action = action === "open" ? OPEN_SAFEHOUSE_TOPIC : CLOSE_SAFEHOUSE_TOPIC;
+
     for (const unit of need_to_open_unit_arr) {
-        const topic = unit.unique_id + '/' + OPEN_SAFEHOUSE_TOPIC;
+        const topic = unit.unique_id + '/' + topic_action;
         // domain_objs[unit.domain].publish_mqtt_message(topic, '1');
         await delay(100);
     }
@@ -243,6 +286,45 @@ async function execute_open_with_delay(need_to_open_unit_arr, domain_objs) {
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function generate_red_alert_message(red_alert_poligon_arr, closed_units, poligon_units_array) {
+    const current_time = new Date().toLocaleString('en-IL', { hour12: false });
+
+    let file_content = `\u200Fצבע אדום בשעה ${current_time} באזורים: ${red_alert_poligon_arr.join(', ')}\n\n`;
+    file_content += `\u200Fהיחידות הפעילות שלא נפתחו באזורים:\n\n`;
+
+    for (const unit of closed_units) {
+        console.log(unit);
+        file_content += `\u200F${unit.unit_local_id},  ${unit.device_serial.slice(-4)},  ${unit.address},  ${unit.domain}\n`;
+    }
+
+    file_content += `\n\u200Fכמות היחידות שלא נפתחו: ${closed_units.length} מתוך ${poligon_units_array.length}.\n`;
+    file_content += `\u200Fתאריך ושעה: ${current_time}\n`;
+
+    return file_content;
+}
+
+function generate_dictionary_with_local_id_and_address(domain_objs, units_local_id_and_addresses_array) {
+    const updated_units = {};
+    Object.values(domain_objs).forEach(unit => {
+        // Find the match in the units_local_id_and_addresses_array
+        const match_units = units_local_id_and_addresses_array.find(
+            item => item.DeviceSerial === unit.device_serial
+        );
+
+        unit.unit_address = match_units ? match_units.Address || '-' : '-';
+        unit.unit_local_id = match_units ? match_units.Name || '-' : '-';
+        unit.unit_system_type = unit.system_type_id === 1 ? 'panic-control' : 'safehouse';
+        updated_units[unit.device_serial] = unit;
+    });
+    return updated_units;
+}
+
+function set_non_active_units(domain_objects) {
+    for (const domain_obj of Object.values(domain_objects)) {
+        domain_obj.check_non_active_units_and_get_domain_units_state(_HEARTBEAT_THRESHOLD);
+    }
 }
 
 main();

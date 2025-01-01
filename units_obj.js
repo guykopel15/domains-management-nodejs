@@ -5,11 +5,15 @@ class Units_Object {
     #non_active_units = -1;
     #need_update = true;
     units = {};
+    last_report_time = {};
+    time = [ "14:01", "14:07", "17:00"];
+    date_timestamp_arr = [];
     #mqtt_client = null;
 
     constructor(domain_name, units_json_dict = {}) {
         this.#domain_name = domain_name;
         this.init(domain_name, units_json_dict);
+        this.update_date_timestamps();
     }
 
     // Initialize the domain and units
@@ -20,7 +24,60 @@ class Units_Object {
             item.is_active = false;
             this.upsert(item);
         });
+
         this.#total_unit_count = units_array.length;
+    }
+
+    // Generate and set timestamps for the current day
+    update_date_timestamps() {
+        const current_date = new Date();
+        this.date_timestamp_arr = this.time.map(time => {
+            const [hours, minutes] = time.split(':');
+            return new Date(
+                current_date.getFullYear(),
+                current_date.getMonth(),
+                current_date.getDate(),
+                parseInt(hours),
+                parseInt(minutes)
+            ).getTime();
+        });
+
+        // Initialize the last report times
+        this.date_timestamp_arr.forEach(timestamp => {
+            if (!this.last_report_time[timestamp]) {
+                this.last_report_time[timestamp] = null; 
+            }
+        });
+    }
+
+    is_time_to_execute_and_send_report() {
+        const current_time = new Date().getTime() + (2 * 60 * 60 * 1000); 
+    
+        for (const timestamp of this.date_timestamp_arr) {
+            if (current_time >= timestamp && (!this.last_report_time[timestamp])) {
+                this.last_report_time[timestamp] = current_time; 
+                return true;
+            }
+        }
+    
+        return false;
+    }
+    
+    update_last_report_time(current_time) {
+        const current_timestamp = this.date_timestamp_arr.find(
+            timestamp => current_time > timestamp && (!this.last_report_time[timestamp] || current_time > this.last_report_time[timestamp])
+        );
+    
+        if (current_timestamp) {
+            this.last_report_time[current_timestamp] = current_time; // Use the passed `current_time`
+            console.log(`Updated last_report_time for domain ${this.#domain_name}:`, this.last_report_time);
+        } else {
+            console.log(`No valid timestamp to update for domain ${this.#domain_name}`);
+        }
+    }
+
+    set_domain_name(domain_name) {
+        this.#domain_name = domain_name;
     }
 
     /////////////////////////////////////////////// mqtt ///////////////////////////////////////////////
@@ -42,17 +99,20 @@ class Units_Object {
         const existing_unit = this.units[unit.device_serial];
         if (existing_unit) {
             unit = {
-                ...existing_unit,             
-                ...unit,                      
-                unit_address: unit.unit_address || existing_unit.unit_address || '-', 
+                ...existing_unit,
+                ...unit,
+                unit_address: unit.unit_address || existing_unit.unit_address || '-',
                 unit_local_id: unit.unit_local_id || existing_unit.unit_local_id || '-',
                 unit_system_type: unit.system_type_id === 1 ? 'panic-control' : 'safehouse',
             };
         }
         this.units[unit.device_serial] = unit;
     }
-    
-    
+
+    upsert_last_report_time(new_time) {
+        this.last_report_time = new_time;
+    }
+
     update_non_active_count() {
         const last_count = this.#non_active_units;
         this.#non_active_units = 0;
@@ -151,6 +211,12 @@ class Units_Object {
 
     get_all_units() {
         return Object.values(this.units);
+    }
+
+    get_all_open_or_close_units(status) {
+        return Object.values(this.units).filter(unit =>
+            (status === 'open' && unit.is_open) || (status === 'close' && !unit.is_open)
+        );
     }
 }
 
