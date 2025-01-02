@@ -7,8 +7,8 @@ class Units_Object {
     units = {};
     scheduler = {
         last_report_time: {},
-        time: ["15:21", "17:00"],
-        date_timestamp_arr: [],
+        scheduler_time_str_arr: ["19:00", "19:10"],
+        scheduler_timestamp_arr: [],
     };
     #mqtt_client = null;
 
@@ -33,24 +33,25 @@ class Units_Object {
     // Generate and set timestamps for the current day
     update_date_timestamps() {
         const current_date = new Date();
-        this.scheduler.date_timestamp_arr = this.scheduler.time.map(time => {
+        this.scheduler.scheduler_timestamp_arr = this.scheduler.scheduler_time_str_arr.map(time => {
             const [hours, minutes] = time.split(':');
             return new Date(
                 current_date.getFullYear(),
                 current_date.getMonth(),
                 current_date.getDate(),
-                parseInt(hours),
-                parseInt(minutes)
+                parseInt(hours, 10),
+                parseInt(minutes, 10)
             ).getTime();
         });
-
-        // Initialize the last report times
-        this.scheduler.date_timestamp_arr.forEach(timestamp => {
+    
+        // Ensure `last_report_time` is initialized for all timestamps
+        this.scheduler.scheduler_timestamp_arr.forEach(timestamp => {
             if (!this.scheduler.last_report_time[timestamp]) {
                 this.scheduler.last_report_time[timestamp] = null;
             }
         });
     }
+    
 
     is_time_to_execute_and_send_report() {
         const current_time = new Date().getTime() + (2 * 60 * 60 * 1000); // Adjusting for timezone

@@ -32,6 +32,9 @@ const {
     CLOSE_SAFEHOUSE_TOPIC
 } = require('./CONSTS');
 
+const { update_scheduler_times } = require('./update_domains_scheduler');
+
+
 // List of domains and their respective IP addresses
 const _mysql_servers = [
     { name: 'bobo', host: '34.0.38.195', url: 'bobo.admin.netiotil.com' },
@@ -89,6 +92,10 @@ async function main() {
 
         console.log(`Units from ${mysql_server.name} added to dictionary.`);
     }
+
+    const domains_to_update = ['bobo', 'bat-yam'];
+    const new_times = [['16:00', '19:10'], ['16:40', '18:30']];
+    await update_scheduler_times(_domain_objs, domains_to_update, new_times);
 
     // Initialize MQTT clients for each domain
     _mysql_servers.forEach((server) => {
