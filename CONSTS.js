@@ -1,6 +1,6 @@
 const LOCAL_BROKER_URL = 'mqtt://127.0.0.1';
 const BOBO1_DOMAIN_NAME = 'bobo';
-const HEARTBEAT_TOPIC = 'internal-general-heartbeat';
+const HEARTBEAT_TOPIC = 'safehouse-heartbeat';
 const RED_ALERT_NOTIFY_TOPIC = 'red-alert-notify';
 const OPEN_SAFEHOUSE_TOPIC = 'lock-open';
 const CLOSE_SAFEHOUSE_TOPIC = 'lock-close';

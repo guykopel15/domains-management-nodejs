@@ -7,18 +7,11 @@ const {
     MONGO_DB_BOTS_COLLECTION_NAME
 } = require('../CONSTS');
 
-// Connect to MongoDB
-async function connect_to_mongodb() {
-    const client = new MongoClient(MONGO_DB_URL);
-    await client.connect();
-    const db = client.db(MONGO_DB_BOTS_DATABASE);
-    const collection = db.collection(MONGO_DB_BOTS_COLLECTION_NAME);
-    return { client, collection };
-}
+const {connect_to_mongodb_telegram} = require('../mongo_handling');
 
 // Function to add a bot to MongoDB
 async function add_bot_to_mongodb(bot) {
-    const { client, collection } = await connect_to_mongodb();
+    const { client, collection } = await connect_to_mongodb_telegram();
 
     const existing_bot = await collection.findOne({ token: bot.token });
     if (!existing_bot) {

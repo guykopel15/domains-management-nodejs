@@ -1,51 +1,48 @@
-const MqttClient_Obj = require('./mqtt_client');
-const { MYSQL_SERVERS, HEARTBEAT_TOPIC } = require('./CONSTS');
-const emitter = require('./event_bus');
+const mqtt = require('mqtt');
+const eventBus = require('./eventBus');
+const { MYSQL_SERVERS } = require('./CONSTS');
 
-// Shared units array
-var _units_array = [];
-
-async function main() {
-    console.log('Starting main function...');
-    initialize_mqtt_clients();
-    setup_message_listener();
-    start_returning_messages();
-}
-
+// Initialize and connect MQTT clients for each server
 function initialize_mqtt_clients() {
     MYSQL_SERVERS.forEach((server) => {
-        new MqttClient_Obj(
-            server.name,
-            `mqtt://${server.host}`,
-            1883,
-            [HEARTBEAT_TOPIC]
-        );
-    });
-}
+        const mqtt_client = mqtt.connect(`mqtt://${server.host}`);
 
-function setup_message_listener() {
-    emitter.on('mqtt_message_received', (topic, message, domain_name) => {
-        if (topic === HEARTBEAT_TOPIC) {
-            _units_array.push({
-                domain_name,
+        mqtt_client.on('connect', () => {
+            console.log(`Connected to MQTT broker for domain: ${server.name}`);
+            mqtt_client.subscribe('#', (err) => {
+                if (err) {
+                    console.error(`Error subscribing to all topics for domain ${server.name}:`, err);
+                } else {
+                    console.log(`Subscribed to all topics for domain: ${server.name}`);
+                }
+            });
+        });
+
+        mqtt_client.on('message', (topic, message) => {
+            const data = {
+                domain_name: server.name,
                 topic,
                 message: message.toString(),
                 timestamp: new Date(),
-            });
-        }
+            };
+
+            // Emit an event for the topic
+            eventBus.emit(topic, data);
+
+            // Emit a generic event for all messages
+            eventBus.emit('mqtt_message_received', data);
+
+            console.log(`Message received on topic "${topic}" from domain "${server.name}":`, data.message);
+        });
+
+        mqtt_client.on('error', (err) => {
+            console.error(`Error in MQTT client for domain ${server.name}:`, err);
+        });
+
+        mqtt_client.on('close', () => {
+            console.log(`MQTT connection closed for domain: ${server.name}`);
+        });
     });
 }
 
-function start_returning_messages() {
-    setInterval(() => {
-        console.log('Returning heartbeat messages...');
-        console.log(_units_array);
-    }, 5000);
-}
-
-// Export the units array for external use
-module.exports = { _units_array };
-
-main().catch((error) => {
-    console.error('Error in main function:', error);
-});
+module.exports = { initialize_mqtt_clients };

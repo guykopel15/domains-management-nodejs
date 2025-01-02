@@ -1,5 +1,14 @@
 const { MongoClient } = require('mongodb');
-const { MONGO_DB_URL, MONGO_DB_DATABASE, MONGO_UNIT_COLLECTION_NAME } = require('./CONSTS');
+const { MONGO_DB_URL, MONGO_DB_DATABASE, MONGO_UNIT_COLLECTION_NAME, MONGO_DB_BOTS_DATABASE, MONGO_DB_BOTS_COLLECTION_NAME } = require('./CONSTS');
+
+// Connect to MongoDB
+async function connect_to_mongodb_telegram() {
+    const client = new MongoClient(MONGO_DB_URL);
+    await client.connect();
+    const db = client.db(MONGO_DB_BOTS_DATABASE);
+    const collection = db.collection(MONGO_DB_BOTS_COLLECTION_NAME);
+    return { client, collection };
+}
 
 async function get_units_from_mongodb_and_insert_to_the_dictionary(dic) {
     const client = new MongoClient(MONGO_DB_URL);
@@ -137,5 +146,6 @@ module.exports = {
     convert_mysql_table_name_to_mongo_naming,
     add_domain_name_to_the_db_units_json,
     get_all_data_from_mongo,
-    add_to_mongo
+    add_to_mongo,
+    connect_to_mongodb_telegram
 };

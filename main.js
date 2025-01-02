@@ -1,6 +1,7 @@
 const Units_Object = require('./units_obj');
 const MqttClient_Obj = require('./mqtt_client');
 const _emitter = require('./event_bus');
+
 const { notify_all_connected_users } = require('./telegram/telegram_bot');
 
 const {
@@ -62,16 +63,12 @@ async function main() {
     console.log('Starting main function...');
 
     // Initialize domain objects
-    _mysql_servers.forEach(server => {
+    _mysql_servers.forEach((server) => {
         _domain_objs[server.name] = new Units_Object(server.name, {});
     });
 
-    // Initialize MQTT client
-    _localhost_mqtt_client = new MqttClient_Obj(BOBO1_DOMAIN_NAME, LOCAL_BROKER_URL, 1883, LOCAL_SUBSCRIPTION_TOPICS);
-
-    // Process each MySQL server
+    // Process MySQL data for each domain
     for (const mysql_server of _mysql_servers) {
-
         const db_units = await fetch_units_from_specific_sql_domain(mysql_server.host);
 
         const db_units_full_json = add_domain_name_to_the_db_units_json(db_units, mysql_server.name);
@@ -79,8 +76,6 @@ async function main() {
         const mongo_table = convert_mysql_row_to_mongo_rows(db_units_full_json);
 
         const domain_obj = _domain_objs[mysql_server.name];
-
-        domain_obj.set_domain_name(mysql_server.name);
 
         const units_local_id_and_addresses_array = await fetch_ids_and_addresses_from_specific_sql_domain(mysql_server.host);
 
@@ -95,14 +90,15 @@ async function main() {
         console.log(`Units from ${mysql_server.name} added to dictionary.`);
     }
 
-    // Initialize MQTT clients for domains
-    for (const mysql_server of _mysql_servers) {
-        const domain_obj = _domain_objs[mysql_server.name];
-        const mqtt_broker = `mqtt://${mysql_server.host}`;
-        const mqtt_client = new MqttClient_Obj(mysql_server.name, mqtt_broker, 1883);
+    // Initialize MQTT clients for each domain
+    _mysql_servers.forEach((server) => {
+        const domain_obj = _domain_objs[server.name];
+        const mqtt_broker = `mqtt://${server.host}`;
+        const mqtt_client = new MqttClient_Obj(server.name, mqtt_broker, 1883, LOCAL_SUBSCRIPTION_TOPICS);
+
         domain_obj.set_mqtt_client(mqtt_client);
-        console.log(`MQTT client for ${mysql_server.name} created.`);
-    }
+        console.log(`MQTT client for ${server.name} created.`);
+    });
 
     interval_functions_every_60_seconds(_domain_objs);
 }
@@ -124,7 +120,7 @@ function interval_functions_every_60_seconds(domain_objs) {
             handle_units_from_mongodb_into_the_dictionary(units_as_dic);
 
             if (!domain_obj.is_time_to_execute_and_send_report()) {
-                console.log(`Skipping report for domain ${mysql_server.name}`);
+                // console.log(`Skipping report for domain ${mysql_server.name}`);
                 continue;
             }
 
@@ -136,12 +132,12 @@ function interval_functions_every_60_seconds(domain_objs) {
 
             // Open all units
             await run_multiple_times_with_delay(units_in_domain, 3, 10 * 1000, domain_objs_array, "open");
-            console.log(`All units opened for domain ${mysql_server.name}`);
+            console.log(`Units opened for domain ${mysql_server.name}`);
             const close_units = domain_obj.get_all_open_or_close_units("close");
 
             // Close all units
             await run_multiple_times_with_delay(units_in_domain, 3, 10 * 1000, domain_objs_array, "close");
-            console.log(`All units closed for domain ${mysql_server.name}`);
+            console.log(`Units closed for domain ${mysql_server.name}`);
             const open_units = domain_obj.get_all_open_or_close_units("open");
 
             // Identify faulty units
@@ -151,12 +147,13 @@ function interval_functions_every_60_seconds(domain_objs) {
 
             // Build the report message
             full_message += `דומיין: ${mysql_server.name}\n`;
-            full_message += `יחידות תקולות:\nבל היחידות שגם לא נפתחו בפתיחה וגם לא נסגרו בסגירה:\n`;
+            full_message += `יחידות תקולות:\n היחידות שגם לא נפתחו בפתיחה וגם לא נסגרו בסגירה:\n`;
             full_message += `${generate_units_summary_message(faulty_units)}\n`;
             full_message += `\nסיכום דו"ח של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
             full_message += `כמות היחידות התקולות: ${faulty_units.length} מתוך ${units_in_domain.length}\n`;
 
             notify_all_connected_users(full_message, domain_obj.get_domain_name());
+            console.log(JSON.stringify(domain_objs_array, null, 4));
             console.log(`Report sent and last_report_time updated for domain ${mysql_server.name}`);
         }
     }, 60 * 1000);
@@ -175,17 +172,17 @@ function generate_units_summary_message(units_array) {
 }
 
 _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
+    const units = JSON.parse(message.toString());
+    const units_array = Array.isArray(units) ? units : [units];
+
     switch (topic) {
         case HEARTBEAT_TOPIC:
-            console.log(topic);
-            const units = JSON.parse(message.toString());
-            for (const unit of units) {
-                console.log(unit);
-                if (unit.action !== 'heartbeat')
-                    continue;
+            for (const unit of units_array) {
 
-                const domain_obj = _domain_objs[unit.domain];
+                // Ensure the unit is associated with the correct domain
+                const domain_obj = _domain_objs[domain_name];
                 unit.is_active = true;
+                unit.domain = domain_name;
                 domain_obj.upsert(unit);
                 domain_obj.update_active_count();
                 domain_obj.update_non_active_count();
@@ -198,21 +195,19 @@ _emitter.on('mqtt_message_received', (topic, message, domain_name) => {
             const red_alert_poligon_arr = red_alert_message.alert.data;
             const poligon_units_array = get_units_arr_that_match_poligon_alert(red_alert_poligon_arr, _domain_objs);
             console.log(red_alert_poligon_arr);
-            // console.log(poligon_units_array);
 
-            // const polygon_unit_domain = poligon_units_array[0][0].domain;
-            // run_multiple_times_with_delay(poligon_units_array, 3, 10 * 1000, _domain_objs, "open").then(() => {
-            //     const close_units = _domain_objs[polygon_unit_domain].get_all_open_or_close_units("close");
-            //     const file_content = generate_red_alert_message(red_alert_poligon_arr, close_units, poligon_units_array);
-            //     notify_all_connected_users(file_content, polygon_unit_domain);
-            // });
+            const polygon_unit_domain = poligon_units_array[0].domain;
+            run_multiple_times_with_delay(poligon_units_array, 3, 10 * 1000, _domain_objs, "open").then(() => {
+                const close_units = _domain_objs[polygon_unit_domain].get_all_open_or_close_units("close");
+                const file_content = generate_red_alert_message(red_alert_poligon_arr, close_units, poligon_units_array);
+                notify_all_connected_users(file_content, polygon_unit_domain);
+            });
             break;
 
         case GENERAL_LOCK_ACKNOWLEDGE_TOPIC:
             {
                 const units = JSON.parse(message.toString());
                 for (const incomming_unit of units) {
-                    const domain_name = incomming_unit.domain;
                     const domain_obj = _domain_objs[domain_name];
                     const unit = domain_obj.units[incomming_unit.device_serial];
                     if (unit) {
@@ -247,20 +242,19 @@ function is_part_of_polygon(unit_polygons, red_alert_polygons) {
 
 function get_units_arr_that_match_poligon_alert(red_alert_polygons, domain_objs) {
     const units = [];
+
     Object.values(domain_objs).forEach(domain_obj => {
         for (const device_serial in domain_obj.units) {
             const unit = domain_obj.units[device_serial];
             if (!unit.is_active || (!unit.saved_location && !unit.red_alert_polygon) || unit.saved_location === 'null')
                 continue;
 
-            if(unit.domain === 'sderot')
-                
             if (is_part_of_polygon(unit.saved_location, red_alert_polygons) || is_part_of_polygon(unit.red_alert_polygon, red_alert_polygons)) {
                 units.push(unit);
             }
         }
     });
-    
+
     console.log(`Array length => ${units.length}`);
     return units;
 }
@@ -295,7 +289,6 @@ function generate_red_alert_message(red_alert_poligon_arr, closed_units, poligon
     file_content += `\u200Fהיחידות הפעילות שלא נפתחו באזורים:\n\n`;
 
     for (const unit of closed_units) {
-        console.log(unit);
         file_content += `\u200F${unit.unit_local_id},  ${unit.device_serial.slice(-4)},  ${unit.address},  ${unit.domain}\n`;
     }
 
