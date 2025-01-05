@@ -1,5 +1,10 @@
 const { MongoClient } = require('mongodb');
-const { MONGO_DB_URL, MONGO_DB_DATABASE } = require('./CONSTS');
+
+const {
+    MONGO_DB_URL,
+    MONGO_DB_DATABASE
+} = require('./CONSTS');
+
 
 async function update_scheduler_times(domain_objects, domain_names, new_times) {
     if (domain_names.length !== new_times.length) {
@@ -13,16 +18,17 @@ async function update_scheduler_times(domain_objects, domain_names, new_times) {
             return;
         }
 
-        // Update the time strings and regenerate timestamps
+        // Update the time strings
         domain_obj.scheduler.scheduler_time_str_arr = new_times[index];
-        domain_obj.update_date_timestamps(); // Ensure this function updates scheduler_timestamp_arr
+        // Regenerate timestamps
+        domain_obj.update_date_timestamps();
 
         console.log(`Scheduler times updated for domain: ${domain_name}`);
-        console.log(`New times: ${JSON.stringify(domain_obj.scheduler.scheduler_time_str_arr)}`);
+        console.log(`New time strings: ${JSON.stringify(domain_obj.scheduler.scheduler_time_str_arr)}`);
         console.log(`New timestamps: ${JSON.stringify(domain_obj.scheduler.scheduler_timestamp_arr)}`);
     });
 
-    // Optionally, persist changes to MongoDB for persistence
+    // Optionally persist changes to MongoDB
     await save_scheduler_times_to_mongo(domain_objects, domain_names);
 }
 
@@ -35,14 +41,16 @@ async function save_scheduler_times_to_mongo(domain_objects, domain_names) {
 
         for (const domain_name of domain_names) {
             const domain_obj = domain_objects[domain_name];
-            if (!domain_obj) continue;
+            if (!domain_obj) 
+                continue;
 
             await collection.updateOne(
                 { domain_name },
                 {
                     $set: {
                         scheduler_time_str_arr: domain_obj.scheduler.scheduler_time_str_arr,
-                        scheduler_timestamp_arr: domain_obj.scheduler.scheduler_timestamp_arr
+                        scheduler_timestamp_arr: domain_obj.scheduler.scheduler_timestamp_arr,
+                        last_report_time: domain_obj.scheduler.last_report_time
                     }
                 },
                 { upsert: true }
@@ -55,4 +63,7 @@ async function save_scheduler_times_to_mongo(domain_objects, domain_names) {
     }
 }
 
-module.exports = { update_scheduler_times };
+module.exports = {
+    update_scheduler_times,
+    save_scheduler_times_to_mongo
+};

@@ -1,16 +1,21 @@
+const { MongoClient } = require('mongodb');
+const { MONGO_DB_URL, MONGO_DB_DATABASE } = require('./CONSTS');
+
+
 class Units_Object {
     #domain_name = "";
     #total_unit_count = -1;
     #active_units = -1;
     #non_active_units = -1;
     #need_update = true;
+    #report_in_progress = false;
     units = {};
+    #mqtt_client = null;
     scheduler = {
         last_report_time: {},
-        scheduler_time_str_arr: ["19:00", "19:10"],
+        scheduler_time_str_arr: ["13:23"],
         scheduler_timestamp_arr: [],
     };
-    #mqtt_client = null;
 
     constructor(domain_name, units_json_dict = {}) {
         this.#domain_name = domain_name;
@@ -18,7 +23,6 @@ class Units_Object {
         this.update_date_timestamps();
     }
 
-    // Initialize the domain and units
     init(domain_name, units_json_dict) {
         this.#domain_name = domain_name;
         const units_array = Object.values(units_json_dict);
@@ -30,7 +34,67 @@ class Units_Object {
         this.#total_unit_count = units_array.length;
     }
 
-    // Generate and set timestamps for the current day
+    async load_last_report_times() {
+        const client = new MongoClient(MONGO_DB_URL);
+        await client.connect();
+        const db = client.db(MONGO_DB_DATABASE);
+        const collection = db.collection('report_times');
+        const report_data = await collection.findOne({ domain_name: this.#domain_name });
+        if (report_data && report_data.scheduler && report_data.scheduler.last_report_time) {
+            this.scheduler.last_report_time = report_data.scheduler.last_report_time;
+        }
+    }
+
+    async is_time_to_execute_and_send_report() {
+        const current_time = Date.now() + (2 * 60 * 60 * 1000); 
+        
+        if (this.#report_in_progress) {
+            console.log(`Report already in progress for domain: ${this.#domain_name}`);
+            return false;
+        }
+    
+        // Find overdue timestamps
+        const overdue_timestamps = this.scheduler.scheduler_timestamp_arr.filter(
+            timestamp => current_time >= timestamp && !this.scheduler.last_report_time[timestamp]
+        );
+    
+        if (overdue_timestamps.length > 0) {
+            // Select the most recent overdue timestamp
+            const most_recent_timestamp = Math.max(...overdue_timestamps);
+    
+            console.log(`Starting report for domain: ${this.#domain_name}`);
+            
+            this.#report_in_progress = true;
+            this.scheduler.last_report_time[most_recent_timestamp] = current_time;
+    
+            // Mark earlier overdue timestamps as processed
+            overdue_timestamps.forEach(timestamp => {
+                if (timestamp !== most_recent_timestamp) {
+                    this.scheduler.last_report_time[timestamp] = current_time;
+                }
+            });
+    
+            await this.save_last_report_time(most_recent_timestamp);
+            console.log(`Report started for domain: ${this.#domain_name}`);
+            return true;
+        }
+    
+        console.log(`No overdue timestamps for domain: ${this.#domain_name}`);
+        return false;
+    }
+    
+    
+    
+    mark_report_complete() {
+        if (this.#report_in_progress) {
+            this.#report_in_progress = false;
+            console.log(`Report marked as complete for domain: ${this.#domain_name}`);
+        } else {
+            console.log(`No report in progress to mark complete for domain: ${this.#domain_name}`);
+        }
+    }
+    
+
     update_date_timestamps() {
         const current_date = new Date();
         this.scheduler.scheduler_timestamp_arr = this.scheduler.scheduler_time_str_arr.map(time => {
@@ -43,40 +107,40 @@ class Units_Object {
                 parseInt(minutes, 10)
             ).getTime();
         });
-    
-        // Ensure `last_report_time` is initialized for all timestamps
+
         this.scheduler.scheduler_timestamp_arr.forEach(timestamp => {
             if (!this.scheduler.last_report_time[timestamp]) {
                 this.scheduler.last_report_time[timestamp] = null;
             }
         });
     }
-    
 
-    is_time_to_execute_and_send_report() {
-        const current_time = new Date().getTime() + (2 * 60 * 60 * 1000); // Adjusting for timezone
 
-        for (const timestamp of this.scheduler.date_timestamp_arr) {
-            if (current_time >= timestamp && (!this.scheduler.last_report_time[timestamp])) {
-                this.scheduler.last_report_time[timestamp] = current_time;
-                return true;
-            }
+    async update_last_report_time(timestamp) {
+        const current_time = new Date().getTime();
+        if (this.scheduler.last_report_time[timestamp] === null || this.scheduler.last_report_time[timestamp] < current_time) {
+            this.scheduler.last_report_time[timestamp] = current_time;
+            await this.save_last_report_time(timestamp);
+            console.log(`Updated last_report_time for timestamp ${timestamp} to ${current_time}`);
         }
-
-        return false;
     }
 
-    update_last_report_time(current_time) {
-        const current_timestamp = this.scheduler.date_timestamp_arr.find(
-            timestamp => current_time > timestamp && (!this.scheduler.last_report_time[timestamp] || current_time > this.scheduler.last_report_time[timestamp])
+    async save_last_report_time(timestamp) {
+        const client = new MongoClient(MONGO_DB_URL);
+        await client.connect();
+        const db = client.db(MONGO_DB_DATABASE);
+        const collection = db.collection('report_times');
+
+        // Update or insert the timestamp in MongoDB
+        await collection.updateOne(
+            { domain_name: this.#domain_name },
+            {
+                $set: {
+                    [`scheduler.last_report_time.${timestamp}`]: this.scheduler.last_report_time[timestamp],
+                },
+            },
+            { upsert: true }
         );
-
-        if (current_timestamp) 
-            this.scheduler.last_report_time[current_timestamp] = current_time; // Use the passed `current_time`
-    }
-
-    set_domain_name(domain_name) {
-        this.#domain_name = domain_name;
     }
 
     /////////////////////////////////////////////// mqtt ///////////////////////////////////////////////
@@ -89,6 +153,9 @@ class Units_Object {
     }
 
     /////////////////////////////////////////////// end mqtt ///////////////////////////////////////////////
+    set_domain_name(domain_name) {
+        this.#domain_name = domain_name;
+    }
 
     add_unit(unit) {
         this.units[unit.device_serial] = unit;

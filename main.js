@@ -93,9 +93,9 @@ async function main() {
         console.log(`Units from ${mysql_server.name} added to dictionary.`);
     }
 
-    const domains_to_update = ['bobo', 'bat-yam'];
-    const new_times = [['16:00', '19:10'], ['16:40', '18:30']];
-    await update_scheduler_times(_domain_objs, domains_to_update, new_times);
+    // const domains_to_update = ['bobo', 'bat-yam'];
+    // const new_times = [['16:00', '19:10'], ['16:40', '18:30']];
+    // await update_scheduler_times(_domain_objs, domains_to_update, new_times);
 
     // Initialize MQTT clients for each domain
     _mysql_servers.forEach((server) => {
@@ -113,25 +113,15 @@ async function main() {
 function interval_functions_every_60_seconds(domain_objs) {
     setInterval(async () => {
         for (const mysql_server of _mysql_servers) {
-            const mysql_all_units = await fetch_units_from_specific_sql_domain(mysql_server.host);
-
-            const db_units_full_json = {};
-            for (const [key, unit] of Object.entries(mysql_all_units)) {
-                db_units_full_json[key] = { ...unit, domain: mysql_server.name };
-            }
-
-            const units_as_dic = convert_mysql_row_to_mongo_rows(db_units_full_json);
             const domain_obj = domain_objs[mysql_server.name];
-            set_non_active_units(domain_objs);
-            upsert_dictionary(domain_obj, units_as_dic);
-            handle_units_from_mongodb_into_the_dictionary(units_as_dic);
 
-            if (!domain_obj.is_time_to_execute_and_send_report()) {
-                // console.log(`Skipping report for domain ${mysql_server.name}`);
+            if (!(await domain_obj.is_time_to_execute_and_send_report())) {
+                console.log(`It's not time to execute and send report for domain ${mysql_server.name}`);
                 continue;
             }
 
             console.log(`It's time to execute and send report for domain ${mysql_server.name}`);
+
             let full_message = `בדיקה יומית של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
 
             const units_in_domain = Object.values(domain_obj.units);
@@ -154,14 +144,14 @@ function interval_functions_every_60_seconds(domain_objs) {
 
             // Build the report message
             full_message += `דומיין: ${mysql_server.name}\n`;
-            full_message += `יחידות תקולות:\n היחידות שגם לא נפתחו בפתיחה וגם לא נסגרו בסגירה:\n`;
+            full_message += `יחידות תקולות:\n היחידות שלא נפתחו בפתיחה או לא נסגרו בסגירה:\n`;
             full_message += `${generate_units_summary_message(faulty_units)}\n`;
             full_message += `\nסיכום דו"ח של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
             full_message += `כמות היחידות התקולות: ${faulty_units.length} מתוך ${units_in_domain.length}\n`;
 
             notify_all_connected_users(full_message, domain_obj.get_domain_name());
-            console.log(JSON.stringify(domain_objs_array, null, 4));
-            console.log(`Report sent and last_report_time updated for domain ${mysql_server.name}`);
+            console.log(`Report sent for domain ${mysql_server.name}`);
+            await domain_obj.mark_report_complete();
         }
     }, 60 * 1000);
 }
