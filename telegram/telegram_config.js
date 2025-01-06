@@ -26,7 +26,7 @@ async function add_bot_to_mongodb(bot) {
 
 // Function to remove duplicate bots by name
 async function remove_duplicate_bots_by_name() {
-    const { client, collection } = await connect_to_mongodb();
+    const { client, collection } = await connect_to_mongodb_telegram();
 
     // Find all bots in the collection
     const all_bots = await collection.find({}).toArray();

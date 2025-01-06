@@ -13,7 +13,7 @@ class Units_Object {
     #mqtt_client = null;
     scheduler = {
         last_report_time: {},
-        scheduler_time_str_arr: ["13:23"],
+        scheduler_time_str_arr: ["11:00", "12:40", "12:55", "13:26", "19:00", "23:00"],
         scheduler_timestamp_arr: [],
     };
 
@@ -39,52 +39,64 @@ class Units_Object {
         await client.connect();
         const db = client.db(MONGO_DB_DATABASE);
         const collection = db.collection('report_times');
+
         const report_data = await collection.findOne({ domain_name: this.#domain_name });
-        if (report_data && report_data.scheduler && report_data.scheduler.last_report_time) {
-            this.scheduler.last_report_time = report_data.scheduler.last_report_time;
+        if (report_data?.scheduler?.last_report_time) {
+            this.scheduler.last_report_time = Object.fromEntries(
+                Object.entries(report_data.scheduler.last_report_time).map(([key, value]) => [key, value || null])
+            );
+            console.log(`Loaded last report times for domain: ${this.#domain_name}`);
+        } else {
+            console.log(`No previous report times found for domain: ${this.#domain_name}, initializing.`);
+            this.scheduler.scheduler_timestamp_arr.forEach(timestamp => {
+                this.scheduler.last_report_time[timestamp] = null;
+            });
         }
     }
 
+
     async is_time_to_execute_and_send_report() {
-        const current_time = Date.now() + (2 * 60 * 60 * 1000); 
-        
+        // Adjusted for Israel timezone (UTC+2)
+        const current_time = Date.now() + (2 * 60 * 60 * 1000);
+
+        // Check if report is already in progress for this domain name and return false
         if (this.#report_in_progress) {
-            console.log(`Report already in progress for domain: ${this.#domain_name}`);
             return false;
         }
-    
+
         // Find overdue timestamps
         const overdue_timestamps = this.scheduler.scheduler_timestamp_arr.filter(
             timestamp => current_time >= timestamp && !this.scheduler.last_report_time[timestamp]
         );
-    
+
+        // If there are overdue timestamps, start the report and return true to send the report
         if (overdue_timestamps.length > 0) {
-            // Select the most recent overdue timestamp
             const most_recent_timestamp = Math.max(...overdue_timestamps);
-    
-            console.log(`Starting report for domain: ${this.#domain_name}`);
-            
+
+            // Check in MongoDB if the report was already sent
+            const client = new MongoClient(MONGO_DB_URL);
+            await client.connect();
+            const db = client.db(MONGO_DB_DATABASE);
+            const collection = db.collection('report_times');
+            const report_data = await collection.findOne({ domain_name: this.#domain_name });
+
+            // If report already exists, return false
+            if (report_data.scheduler.last_report_time[most_recent_timestamp]) {
+                console.log(`Report for domain: ${this.#domain_name} at timestamp: ${most_recent_timestamp} already exists.`);
+                return false;
+            }
+
+            // Mark report as in progress and save the timestamp
             this.#report_in_progress = true;
             this.scheduler.last_report_time[most_recent_timestamp] = current_time;
-    
-            // Mark earlier overdue timestamps as processed
-            overdue_timestamps.forEach(timestamp => {
-                if (timestamp !== most_recent_timestamp) {
-                    this.scheduler.last_report_time[timestamp] = current_time;
-                }
-            });
-    
             await this.save_last_report_time(most_recent_timestamp);
-            console.log(`Report started for domain: ${this.#domain_name}`);
             return true;
+
         }
-    
-        console.log(`No overdue timestamps for domain: ${this.#domain_name}`);
+
         return false;
     }
-    
-    
-    
+
     mark_report_complete() {
         if (this.#report_in_progress) {
             this.#report_in_progress = false;
@@ -93,7 +105,6 @@ class Units_Object {
             console.log(`No report in progress to mark complete for domain: ${this.#domain_name}`);
         }
     }
-    
 
     update_date_timestamps() {
         const current_date = new Date();
@@ -115,7 +126,6 @@ class Units_Object {
         });
     }
 
-
     async update_last_report_time(timestamp) {
         const current_time = new Date().getTime();
         if (this.scheduler.last_report_time[timestamp] === null || this.scheduler.last_report_time[timestamp] < current_time) {
@@ -131,18 +141,21 @@ class Units_Object {
         const db = client.db(MONGO_DB_DATABASE);
         const collection = db.collection('report_times');
 
-        // Update or insert the timestamp in MongoDB
+        const current_time = Date.now() + (2 * 60 * 60 * 1000); 
+        this.scheduler.last_report_time[timestamp] = current_time;
+
         await collection.updateOne(
             { domain_name: this.#domain_name },
             {
                 $set: {
-                    [`scheduler.last_report_time.${timestamp}`]: this.scheduler.last_report_time[timestamp],
+                    [`scheduler.last_report_time.${timestamp}`]: current_time,
                 },
             },
             { upsert: true }
         );
-    }
 
+        console.log(`Saved last report time for domain: ${this.#domain_name} at timestamp: ${timestamp}`);
+    }
     /////////////////////////////////////////////// mqtt ///////////////////////////////////////////////
     set_mqtt_client(mqtt_client) {
         this.#mqtt_client = mqtt_client;

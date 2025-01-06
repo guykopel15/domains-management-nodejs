@@ -107,6 +107,7 @@ async function main() {
         console.log(`MQTT client for ${server.name} created.`);
     });
 
+
     interval_functions_every_60_seconds(_domain_objs);
 }
 
@@ -115,45 +116,75 @@ function interval_functions_every_60_seconds(domain_objs) {
         for (const mysql_server of _mysql_servers) {
             const domain_obj = domain_objs[mysql_server.name];
 
+            // Fetch and prepare the data
+            const mysql_all_units = await fetch_units_from_specific_sql_domain(mysql_server.host);
+
+            const db_units_full_json = {};
+            for (const [key, unit] of Object.entries(mysql_all_units)) {
+                db_units_full_json[key] = { ...unit, domain: mysql_server.name };
+            }
+
+            const units_as_dic = convert_mysql_row_to_mongo_rows(db_units_full_json);
+            set_non_active_units(domain_objs);
+            upsert_dictionary(domain_obj, units_as_dic);
+            handle_units_from_mongodb_into_the_dictionary(units_as_dic);
+
+            // Check if it's time to execute and send a report
             if (!(await domain_obj.is_time_to_execute_and_send_report())) {
-                console.log(`It's not time to execute and send report for domain ${mysql_server.name}`);
+                console.log(`No overdue timestamps for domain: ${mysql_server.name}`);
                 continue;
             }
 
             console.log(`It's time to execute and send report for domain ${mysql_server.name}`);
 
-            let full_message = `בדיקה יומית של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
-
-            const units_in_domain = Object.values(domain_obj.units);
-            const domain_objs_array = Object.values(domain_objs);
-
-            // Open all units
-            await run_multiple_times_with_delay(units_in_domain, 3, 10 * 1000, domain_objs_array, "open");
-            console.log(`Units opened for domain ${mysql_server.name}`);
-            const close_units = domain_obj.get_all_open_or_close_units("close");
-
-            // Close all units
-            await run_multiple_times_with_delay(units_in_domain, 3, 10 * 1000, domain_objs_array, "close");
-            console.log(`Units closed for domain ${mysql_server.name}`);
-            const open_units = domain_obj.get_all_open_or_close_units("open");
-
-            // Identify faulty units
-            const faulty_units = units_in_domain.filter(
-                unit => !open_units.includes(unit) && !close_units.includes(unit)
-            );
-
-            // Build the report message
-            full_message += `דומיין: ${mysql_server.name}\n`;
-            full_message += `יחידות תקולות:\n היחידות שלא נפתחו בפתיחה או לא נסגרו בסגירה:\n`;
-            full_message += `${generate_units_summary_message(faulty_units)}\n`;
-            full_message += `\nסיכום דו"ח של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
-            full_message += `כמות היחידות התקולות: ${faulty_units.length} מתוך ${units_in_domain.length}\n`;
-
+            // Generate and send the report
+            const full_message = await generate_report(domain_obj, mysql_server.name, domain_objs);
             notify_all_connected_users(full_message, domain_obj.get_domain_name());
             console.log(`Report sent for domain ${mysql_server.name}`);
             await domain_obj.mark_report_complete();
         }
     }, 60 * 1000);
+}
+
+
+async function generate_report(domain_obj, domain_name, domain_objs) {
+    let full_message = `בדיקה יומית של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
+
+    const units_in_domain = Object.values(domain_obj.units);
+
+    const { open_units, close_units } = await handle_units_operations(units_in_domain, domain_objs, domain_name);
+
+    const faulty_units = identify_faulty_units(units_in_domain, open_units, close_units);
+
+    full_message += `דומיין: ${domain_name}\n`;
+    full_message += `יחידות תקולות:\n היחידות שלא נפתחו בפתיחה או לא נסגרו בסגירה:\n`;
+    full_message += `${generate_units_summary_message(faulty_units)}\n`;
+    full_message += `\nסיכום דו"ח של השעה ${new Date().toLocaleString('en-IL', { timeZone: 'Asia/Jerusalem', hour12: false })}:\n`;
+    full_message += `כמות היחידות התקולות: ${faulty_units.length} מתוך ${units_in_domain.length}\n`;
+
+    return full_message;
+}
+
+async function handle_units_operations(units_in_domain, domain_objs, domain_name) {
+    const domain_objs_array = Object.values(domain_objs);
+
+    // Open all units
+    await run_multiple_times_with_delay(units_in_domain, 3, 10 * 1000, domain_objs_array, "open");
+    console.log(`Units opened for domain ${domain_name}`);
+    const close_units = domain_objs[domain_name].get_all_open_or_close_units("close");
+
+    // Close all units
+    await run_multiple_times_with_delay(units_in_domain, 3, 10 * 1000, domain_objs_array, "close");
+    console.log(`Units closed for domain ${domain_name}`);
+    const open_units = domain_objs[domain_name].get_all_open_or_close_units("open");
+
+    return { open_units, close_units };
+}
+
+function identify_faulty_units(units_in_domain, open_units, close_units) {
+    return units_in_domain.filter(
+        unit => !open_units.includes(unit) && !close_units.includes(unit)
+    );
 }
 
 function generate_units_summary_message(units_array) {
